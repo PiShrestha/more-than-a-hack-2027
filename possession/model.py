@@ -45,16 +45,32 @@ def add_noise(d, ball_mask, rng):
 
     ball: BAR-ATH's own graded ball-missing mask, cut at a random offset, so gap lengths and their
     drift through a half are reproduced exactly. players: each one drops out as a two-state Markov
-    chain (~7% missing, mean outage ~2 s, matching 20.5 of 22 tracked), plus 0.15 m jitter.
+    chain (~7% missing, mean outage ~2 s, matching 20.5 of 22 tracked). No position jitter: per-frame
+    jitter differentiates into ~2.6 m/s of fake player speed, and the ATD positions are smooth.
     """
     d = dict(d)
     T, S = d["px"].shape
+    # DFL freezes the ball while it is dead (zero motion on every dead frame) -- a shortcut the ATD
+    # does not offer: there the ball keeps being tracked while it is fetched and placed. Replace each
+    # dead stretch with a slow carry from where it died to where play restarts, plus a smooth wobble.
+    bx, by = d["bx"].copy(), d["by"].copy()
+    dead = d["y"] == 2
+    e = np.diff(np.concatenate(([0], dead.astype(np.int8), [0])))
+    for s, t in zip(np.flatnonzero(e == 1), np.flatnonzero(e == -1)):
+        n = t - s
+        a = np.linspace(0, 1, n)
+        a = a * a * (3 - 2 * a)
+        x1, y1 = (bx[t], by[t]) if t < T else (bx[s], by[s])
+        wob = np.cumsum(rng.normal(0, 0.03, (2, n)), axis=1)
+        bx[s:t] = bx[s] + (x1 - bx[s]) * a + wob[0]
+        by[s:t] = by[s] + (y1 - by[s]) * a + wob[1]
+    d["bx"], d["by"] = bx, by
     reps = int(np.ceil(T / len(ball_mask))) + 1
     m = np.tile(ball_mask, reps)
     off = rng.integers(len(ball_mask))
     bm = m[off:off + T]
-    d["bx"] = np.where(bm, np.nan, d["bx"]).astype(np.float32)
-    d["by"] = np.where(bm, np.nan, d["by"]).astype(np.float32)
+    d["bx"] = np.where(bm, np.nan, bx).astype(np.float32)
+    d["by"] = np.where(bm, np.nan, by).astype(np.float32)
     p_off, p_on = 0.07 / 50 / 0.93, 1 / 50
     state = np.zeros(S, bool)
     drop = np.zeros((T, S), bool)
@@ -62,9 +78,8 @@ def add_noise(d, ball_mask, rng):
     for t in range(T):
         state = np.where(state, u[t] > p_on, u[t] < p_off)
         drop[t] = state
-    jit = rng.normal(0, 0.15, (2, T, S)).astype(np.float32)
-    d["px"] = np.where(drop, np.nan, d["px"] + jit[0])
-    d["py"] = np.where(drop, np.nan, d["py"] + jit[1])
+    d["px"] = np.where(drop, np.nan, d["px"])
+    d["py"] = np.where(drop, np.nan, d["py"])
     return d
 
 
@@ -148,9 +163,9 @@ def score(gt, pred):
 
 
 GRID = [dict(switch=s, die=dd, revive=rv)
-        for s in (4, 8, 12, 16, 24, 32, 48)
-        for dd in (4, 8, 16, 24)
-        for rv in (4, 8, 16, 24)]
+        for s in (1, 2, 3, 4, 6, 8, 12)
+        for dd in (8, 16, 24, 32, 48, 64)
+        for rv in (8, 16, 24, 32, 48, 64)]
 
 
 def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
@@ -168,6 +183,8 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
             probas[m] = (p, yv, period)
             acc = (p.argmax(1) == yv)[yv >= 0].mean()
             print("{} frame acc {:.3f}".format(m, acc), flush=True)
+            np.savez(os.path.join(idsse.SRC, "cv_{}.npz".format(m)), p=p, y=yv, period=period,
+                     bvis=~np.isnan(d["bx"]))
     results = []
     for params in GRID:
         s = []
