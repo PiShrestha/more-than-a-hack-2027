@@ -168,7 +168,7 @@ With more time we would try the following.
 
 ## Reproduction
 
-Python 3.14, CPU only, about 15 minutes with 8 cores including the 2.5 GB IDSSE download. Pinned dependencies are in
+Python 3.14, CPU only, about 18 minutes with 8 cores including the 2.5 GB IDSSE download. Pinned dependencies are in
 `requirements-solution.txt`.
 
 ```bash
