@@ -184,7 +184,7 @@ With more time we would try the following.
 
 ## Reproduction
 
-Python 3.14. Prediction is CPU only, about 20 minutes with 8 cores including the 2.5 GB IDSSE
+Python 3.14. Prediction is CPU only, 8 to 18 minutes with 8 cores including the 2.5 GB IDSSE
 download. Pinned dependencies are in
 `requirements-solution.txt`.
 
@@ -197,7 +197,7 @@ bash run.sh          # downloads IDSSE, converts, trains, predicts, validates
 
 `run.sh` writes `submission/submission.csv`. LightGBM training is deterministic (fixed seeds,
 `deterministic=True` with 8 threads) and the CNN is loaded from the committed weights, so repeated
-runs give a byte-identical file. The optional steps in `run.sh` re-derive the committed
+runs give a byte-identical file, also from a fresh clone, environment and download. The optional steps in `run.sh` re-derive the committed
 `possession/tcn.pt` (on a GPU, which may differ in the last bits) and `possession/decoder.json`.
 
 | file | role |
