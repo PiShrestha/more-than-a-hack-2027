@@ -23,14 +23,16 @@ from possession.data import bar_ath  # noqa: E402
 from possession.features import features  # noqa: E402
 
 OUT = os.path.join(ROOT, "submission")
-DECODER = os.path.join(ROOT, "possession", "decoder.json")
+TAG = os.environ.get("POSS_TAG", "")  # experiment suffix; empty for the submission
+DECODER = os.path.join(ROOT, "possession", "decoder{}.json".format(TAG))
 SEED = 0
 LGB = dict(objective="multiclass", num_class=3, learning_rate=0.05, num_leaves=63,
            min_data_in_leaf=200, feature_fraction=0.7, bagging_fraction=0.7, bagging_freq=1,
            lambda_l2=1.0, verbose=-1, seed=SEED, num_threads=8,
            deterministic=True, force_col_wise=True)
-N_ROUNDS = 400
-SUBSAMPLE = 3  # train on every 3rd frame: neighbouring frames are near-duplicates
+LGB["num_leaves"] = int(os.environ.get("POSS_LEAVES", LGB["num_leaves"]))
+N_ROUNDS = int(os.environ.get("POSS_ROUNDS", 1600))
+SUBSAMPLE = int(os.environ.get("POSS_SUB", 3))  # train on every 3rd frame: neighbouring frames are near-duplicates
 
 
 # -- noise model --------------------------------------------------------------------------------
@@ -164,8 +166,8 @@ def score(gt, pred):
 
 GRID = [dict(switch=s, die=dd, revive=rv)
         for s in (1, 2, 3, 4, 6, 8, 12)
-        for dd in (8, 16, 24, 32, 48, 64)
-        for rv in (8, 16, 24, 32, 48, 64)]
+        for dd in (16, 32, 48, 64, 96, 128)
+        for rv in (16, 32, 48, 64, 96, 128)]
 
 
 def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
@@ -183,7 +185,7 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
             probas[m] = (p, yv, period)
             acc = (p.argmax(1) == yv)[yv >= 0].mean()
             print("{} frame acc {:.3f}".format(m, acc), flush=True)
-            np.savez(os.path.join(idsse.SRC, "cv_{}.npz".format(m)), p=p, y=yv, period=period,
+            np.savez(os.path.join(idsse.SRC, "cv{}_{}.npz".format(TAG, m)), p=p, y=yv, period=period,
                      bvis=~np.isnan(d["bx"]))
     results = []
     for params in GRID:

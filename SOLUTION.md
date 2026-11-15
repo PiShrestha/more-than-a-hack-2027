@@ -16,9 +16,9 @@ No label of any kind from BAR-ATH is used for training, tuning or model selectio
 | | spellF1 | macroF1 |
 |---|---|---|
 | official baseline `smooth50`, IDSSE held-out, same noise | 0.182 | 0.439 |
-| our model, IDSSE held-out, argmax without decoding | 0.317 | |
-| **our model, IDSSE held-out, Viterbi decoded** | **0.559** | **0.883** |
-| our model, BAR-ATH public 5 minutes (sanity check only) | 0.667 | 0.855 |
+| our model, IDSSE held-out, argmax without decoding | 0.334 | |
+| **our model, IDSSE held-out, Viterbi decoded** | **0.573** | **0.886** |
+| our model, BAR-ATH public 5 minutes (sanity check only) | 0.680 | 0.860 |
 | official baseline `smooth50`, BAR-ATH public 5 minutes | 0.326 | 0.621 |
 
 The BAR-ATH public window has 17 possessions and is reported only to show the pipeline is
@@ -39,7 +39,7 @@ games and transfer.
 
 The ranking metric scores whole possessions by temporal IoU, so per-frame accuracy is not enough. A
 classifier that is 90% right per frame still flickers and splits possessions, which is why decoding
-alone moves held-out spellF1 from 0.317 to 0.559.
+alone moves held-out spellF1 from 0.334 to 0.573.
 
 ## Data used
 
@@ -105,7 +105,7 @@ along home's attacking direction, which is inferred from the data per half.
 
 ### 3. Classifier
 
-LightGBM multiclass (`H`, `A`, `D`) with 400 rounds, 63 leaves and every third frame. The data is
+LightGBM multiclass (`H`, `A`, `D`) with 1600 rounds, 63 leaves and every third frame. The data is
 mirrored by swapping the teams, and predictions are symmetrised by averaging the model on the
 original and the team-swapped view, so neither side gets a learned bias.
 
@@ -113,7 +113,7 @@ original and the team-swapped view, so neither side gets a learned bias.
 
 The decoder is a Viterbi path over `H`, `A` and `D` using log-probabilities, with penalties for an
 `H`/`A` switch, for alive to dead, and for dead to alive. The penalties
-(`possession/decoder.json`: switch 8, die 16, revive 64) were chosen by grid search maximising
+(`possession/decoder.json`: switch 8, die 16, revive 128) were chosen by grid search maximising
 mean spellF1 on held-out IDSSE matches (3 folds over the 7 matches, with the official
 `possession_metrics.py`). Every graded frame gets a label. We do not abstain, because under
 spellF1 an `X` only repeats the previous label.
@@ -141,15 +141,18 @@ each version only to confirm the pipeline still aligned.
 |---|---|---|---|
 | v1 | first model | 0.539 (inflated by the frozen-ball leak) | 42% |
 | v2 | dead-ball leak removed | 0.555 | 64% (implausible) |
-| **v3** | **position jitter removed** | **0.559** | **43%** |
+| v3 | position jitter removed | 0.559 | 43% |
 | v4 | last-seen and next-seen features across ball gaps | 0.559 (no gain, reverted) | 40% |
+| v5a | 400 to 800 rounds, or 63 to 127 leaves | 0.569 | |
+| v5b | every frame instead of every third | 0.560 (no gain) | |
+| **v5** | **1600 rounds, wider decoder grid (submitted)** | **0.573** | **42.5%** |
 
 ## Limitations
 
 - **Possession granularity.** DFL possessions are shorter (mean 6.7 s) than this challenge's
   (14.2 s in the public window), so a decoder tuned on DFL may switch differently from Metrica's
-  ground truth. On held-out IDSSE we predict 0.69 times the true possession count. On BAR-ATH we
-  predict 322 possessions with a mean of 11.3 s.
+  ground truth. On held-out IDSSE we predict 0.75 times the true possession count. On BAR-ATH we
+  predict 332 possessions with a mean of 11.0 s.
 - **Long ball gaps.** Team accuracy is 0.90 with the ball visible and 0.77 without it. Most of the
   remaining error is here.
 - **One noise model.** The ball mask comes from BAR-ATH, but its correlation with game state, such
@@ -165,7 +168,7 @@ With more time we would try the following.
 
 ## Reproduction
 
-Python 3.14, CPU only, under 10 minutes with 8 cores. Pinned dependencies are in
+Python 3.14, CPU only, about 15 minutes with 8 cores including the 2.5 GB IDSSE download. Pinned dependencies are in
 `requirements-solution.txt`.
 
 ```bash
@@ -176,7 +179,7 @@ bash run.sh          # downloads IDSSE, converts, trains, predicts, validates
 ```
 
 `run.sh` writes `submission/submission.csv`. Training is deterministic (fixed seeds, LightGBM
-`deterministic=True` with 8 threads), and two independent runs produced byte-identical files. The
+`deterministic=True` with 8 threads), and a run from a fresh clone, fresh environment and fresh download reproduced the submitted file byte for byte. The
 optional `python -m possession.model cv` re-derives `possession/decoder.json`.
 
 | file | role |
