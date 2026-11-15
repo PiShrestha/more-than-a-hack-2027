@@ -65,3 +65,4 @@ env/
 slurm_scripts/
 logs/
 submission/proba.npy
+possession/decoder_*.json
