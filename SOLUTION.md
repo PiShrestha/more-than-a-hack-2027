@@ -4,8 +4,8 @@ Technical document for More than a Hack 2027, Phase 1.
 
 ## Summary
 
-We train a per-frame classifier for the three states `H`, `A` and `D` on **seven open Bundesliga
-matches** (IDSSE, Bassek et al. 2025), whose DFL position data carries a per-frame ball status and
+We train per-frame classifiers for the three states `H`, `A` and `D` (gradient-boosted trees
+and a temporal CNN, averaged) on **seven open Bundesliga matches** (IDSSE, Bassek et al. 2025), whose DFL position data carries a per-frame ball status and
 ball possession. Before training, the clean Bundesliga tracking is degraded to look like the
 automatic BAR-ATH tracking, including BAR-ATH's own ball-missing pattern. The per-frame
 probabilities are then decoded into whole possessions with a three-state Viterbi whose switching
@@ -16,9 +16,11 @@ No label of any kind from BAR-ATH is used for training, tuning or model selectio
 | | spellF1 | macroF1 |
 |---|---|---|
 | official baseline `smooth50`, IDSSE held-out, same noise | 0.182 | 0.439 |
-| our model, IDSSE held-out, argmax without decoding | 0.334 | |
-| **our model, IDSSE held-out, Viterbi decoded** | **0.573** | **0.886** |
-| our model, BAR-ATH public 5 minutes (sanity check only) | 0.680 | 0.860 |
+| LightGBM alone, IDSSE held-out, argmax without decoding | 0.334 | |
+| LightGBM alone, IDSSE held-out, Viterbi decoded | 0.573 | 0.886 |
+| temporal CNN alone, IDSSE held-out, Viterbi decoded | 0.611 | 0.906 |
+| **ensemble, IDSSE held-out, Viterbi decoded (submitted)** | **0.622** | **0.908** |
+| ensemble, BAR-ATH public 5 minutes (sanity check only) | 0.715 | 0.890 |
 | official baseline `smooth50`, BAR-ATH public 5 minutes | 0.326 | 0.621 |
 
 The BAR-ATH public window has 17 possessions and is reported only to show the pipeline is
@@ -39,7 +41,7 @@ games and transfer.
 
 The ranking metric scores whole possessions by temporal IoU, so per-frame accuracy is not enough. A
 classifier that is 90% right per frame still flickers and splits possessions, which is why decoding
-alone moves held-out spellF1 from 0.334 to 0.573.
+alone moves LightGBM's held-out spellF1 from 0.334 to 0.573.
 
 ## Data used
 
@@ -109,13 +111,25 @@ LightGBM multiclass (`H`, `A`, `D`) with 1600 rounds, 63 leaves and every third 
 mirrored by swapping the teams, and predictions are symmetrised by averaging the model on the
 original and the team-swapped view, so neither side gets a learned bias.
 
-### 4. Decoding into possessions
+### 4. Temporal CNN
 
-The decoder is a Viterbi path over `H`, `A` and `D` using log-probabilities, with penalties for an
-`H`/`A` switch, for alive to dead, and for dead to alive. The penalties
-(`possession/decoder.json`: switch 8, die 16, revive 128) were chosen by grid search maximising
-mean spellF1 on held-out IDSSE matches (3 folds over the 7 matches, with the official
-`possession_metrics.py`). Every graded frame gets a label. We do not abstain, because under
+`possession/tcn.py`. The LightGBM context stops at 15 s, while ball gaps run 10 to 40 s. A
+non-causal dilated 1-D CNN over the same 111 features (10 residual blocks, dilations 1 to 512,
+width 96, receptive field about 80 s) sees a whole gap and both of its edges at once. It is trained
+with cross-entropy on 4096-frame chunks of 4 noise realisations per match, both team orientations,
+for 30 epochs on one GPU, and symmetrised like LightGBM. The trained weights (`possession/tcn.pt`,
+1.5 MB) are committed and inference runs on CPU, so the submission does not depend on GPU
+floating point.
+
+### 5. Ensemble and decoding into possessions
+
+The two models' probabilities are mixed linearly, with weight 0.75 on the CNN. The decoder is a
+Viterbi path over `H`, `A` and `D` using log-probabilities, with penalties for an `H`/`A` switch,
+for alive to dead, and for dead to alive. The mixing weight and penalties
+(`possession/decoder.json`: switch 8, die 4, revive 32) were chosen jointly by grid search
+maximising mean spellF1 on held-out IDSSE matches (3 folds over the 7 matches, with the official
+`possession_metrics.py`). Both models' held-out probabilities come from the same folds and the
+same validation noise. Every graded frame gets a label. We do not abstain, because under
 spellF1 an `X` only repeats the previous label.
 
 ## Possession rules as implemented
@@ -145,30 +159,33 @@ each version only to confirm the pipeline still aligned.
 | v4 | last-seen and next-seen features across ball gaps | 0.559 (no gain, reverted) | 40% |
 | v5a | 400 to 800 rounds, or 63 to 127 leaves | 0.569 | |
 | v5b | every frame instead of every third | 0.560 (no gain) | |
-| **v5** | **1600 rounds, wider decoder grid (submitted)** | **0.573** | **42.5%** |
+| v5 | 1600 rounds, wider decoder grid | 0.573 | 42.5% |
+| v5c | 3 noise realisations per match for LightGBM | 0.574 (no gain) | |
+| **v6** | **temporal CNN, ensembled 0.75 with v5 (submitted)** | **0.622** | **43.0%** |
 
 ## Limitations
 
 - **Possession granularity.** DFL possessions are shorter (mean 6.7 s) than this challenge's
   (14.2 s in the public window), so a decoder tuned on DFL may switch differently from Metrica's
-  ground truth. On held-out IDSSE we predict 0.75 times the true possession count. On BAR-ATH we
-  predict 332 possessions with a mean of 11.0 s.
-- **Long ball gaps.** Team accuracy is 0.90 with the ball visible and 0.77 without it. Most of the
-  remaining error is here.
+  ground truth. On held-out IDSSE we predict 0.73 times the true possession count. On BAR-ATH we
+  predict 315 possessions with a mean of 11.5 s.
+- **Long ball gaps.** Team accuracy on held-out IDSSE is 0.91 with the ball visible and 0.83
+  without it (0.90 and 0.77 for LightGBM alone). Most of the remaining error is here.
 - **One noise model.** The ball mask comes from BAR-ATH, but its correlation with game state, such
   as crowded boxes and aerial balls, is not reproduced. Gaps are placed at random relative to play.
 - **Smart Tagging is unused.**
 
 With more time we would try the following.
 
-- A sequence model over player trajectories, such as a transformer over a few seconds of all 22
-  players, to estimate ball position and owner through gaps.
+- A model over raw player trajectories (all 22 players, not team aggregates) to estimate ball
+  position and owner through gaps.
 - Running our own ball detector on the tactical video to shrink the gaps.
 - A calibrated restart prior from the set-piece tags.
 
 ## Reproduction
 
-Python 3.14, CPU only, about 18 minutes with 8 cores including the 2.5 GB IDSSE download. Pinned dependencies are in
+Python 3.14. Prediction is CPU only, about 20 minutes with 8 cores including the 2.5 GB IDSSE
+download. Pinned dependencies are in
 `requirements-solution.txt`.
 
 ```bash
@@ -178,14 +195,16 @@ pip install -r requirements.txt -r requirements-solution.txt
 bash run.sh          # downloads IDSSE, converts, trains, predicts, validates
 ```
 
-`run.sh` writes `submission/submission.csv`. Training is deterministic (fixed seeds, LightGBM
-`deterministic=True` with 8 threads), and a run from a fresh clone, fresh environment and fresh download reproduced the submitted file byte for byte. The
-optional `python -m possession.model cv` re-derives `possession/decoder.json`.
+`run.sh` writes `submission/submission.csv`. LightGBM training is deterministic (fixed seeds,
+`deterministic=True` with 8 threads) and the CNN is loaded from the committed weights, so repeated
+runs give a byte-identical file. The optional steps in `run.sh` re-derive the committed
+`possession/tcn.pt` (on a GPU, which may differ in the last bits) and `possession/decoder.json`.
 
 | file | role |
 |---|---|
 | `possession/data.py` | ATD to dense arrays (metres), cached |
 | `possession/idsse.py` | IDSSE XML to the same arrays plus labels, via kloppy |
 | `possession/features.py` | per-frame features |
-| `possession/model.py` | noise model, LightGBM, Viterbi, cross-validation, prediction |
+| `possession/model.py` | noise model, LightGBM, Viterbi, cross-validation, ensemble, prediction |
+| `possession/tcn.py`, `possession/tcn.pt` | temporal CNN and its trained weights |
 | `possession/fetch_idsse.sh`, `run.sh` | download and end-to-end run |

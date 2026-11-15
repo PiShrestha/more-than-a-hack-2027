@@ -32,6 +32,7 @@ LGB = dict(objective="multiclass", num_class=3, learning_rate=0.05, num_leaves=6
            deterministic=True, force_col_wise=True)
 LGB["num_leaves"] = int(os.environ.get("POSS_LEAVES", LGB["num_leaves"]))
 N_ROUNDS = int(os.environ.get("POSS_ROUNDS", 1600))
+AUG = int(os.environ.get("POSS_AUG", 1))
 SUBSAMPLE = int(os.environ.get("POSS_SUB", 3))  # train on every 3rd frame: neighbouring frames are near-duplicates
 
 
@@ -90,17 +91,18 @@ def dataset(matches, ball_mask, seed=SEED, mirror=True, sub=SUBSAMPLE):
     Xs, ys = [], []
     rng = np.random.default_rng(seed)
     for m in matches:
-        d = add_noise(idsse.load(m), ball_mask, rng)
-        X, names = features(d)
-        y = d["y"].astype(np.int64)
-        idx = np.flatnonzero(y >= 0)[::sub]
-        Xs.append(X[idx])
-        ys.append(y[idx])
-        if mirror:
-            Xf, _ = features(d, flip=True)
-            yf = np.where(y == 0, 1, np.where(y == 1, 0, y))
-            Xs.append(Xf[idx])
-            ys.append(yf[idx])
+        for k in range(AUG):  # independent noise realisations; each takes a different frame phase
+            d = add_noise(idsse.load(m), ball_mask, rng)
+            X, names = features(d)
+            y = d["y"].astype(np.int64)
+            idx = np.flatnonzero(y >= 0)[k % sub::sub]
+            Xs.append(X[idx])
+            ys.append(y[idx])
+            if mirror:
+                Xf, _ = features(d, flip=True)
+                yf = np.where(y == 0, 1, np.where(y == 1, 0, y))
+                Xs.append(Xf[idx])
+                ys.append(yf[idx])
     return np.concatenate(Xs), np.concatenate(ys), names
 
 
@@ -166,8 +168,8 @@ def score(gt, pred):
 
 GRID = [dict(switch=s, die=dd, revive=rv)
         for s in (1, 2, 3, 4, 6, 8, 12)
-        for dd in (16, 32, 48, 64, 96, 128)
-        for rv in (16, 32, 48, 64, 96, 128)]
+        for dd in (4, 8, 16, 32, 64, 128)
+        for rv in (4, 8, 16, 32, 64, 128)]
 
 
 def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
@@ -207,6 +209,27 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
     print("wrote", DECODER, best)
 
 
+def ens(lgb_tag="", weights=(0.0, 0.5, 0.6, 0.75, 1.0)):
+    """Tune the LightGBM/TCN mixing weight jointly with the decoder on the saved CV probabilities."""
+    load = lambda pre, m: np.load(os.path.join(idsse.SRC, "{}_{}.npz".format(pre, m)))
+    results = []
+    for w in weights:
+        probas = []
+        for m in idsse.MATCHES:
+            a, b = load("cv" + lgb_tag, m), load("cvtcn", m)
+            assert (a["y"] == b["y"]).all()
+            probas.append(((1 - w) * a["p"] + w * b["p"], a["y"], a["period"]))
+        for params in GRID:
+            s = np.array([score(np.where(y < 0, 3, y), decode(p, per, params)) for p, y, per in probas], float)
+            results.append((s[:, 0].mean(), s[:, 1].mean(), s[:, 2].sum() / s[:, 3].sum(), dict(params, tcn_weight=w)))
+        best_w = max((r for r in results if r[3]["tcn_weight"] == w), key=lambda r: r[0])
+        print("tcn_weight {:.2f}: best spellF1 {:.4f} macroF1 {:.4f} {}".format(w, *best_w[:2], best_w[3]), flush=True)
+    best = max(results, key=lambda r: r[0])
+    with open(DECODER, "w") as fh:
+        json.dump(best[3], fh)
+    print("wrote", DECODER, best[3])
+
+
 def predict():
     mask = bar_ath_ball_mask()
     X, y, names = dataset(list(idsse.MATCHES), mask)
@@ -214,6 +237,10 @@ def predict():
     d = bar_ath()
     proba = predict_proba(model, d)
     params = json.load(open(DECODER))
+    w = params.get("tcn_weight", 0.0)
+    if w > 0:
+        from possession import tcn
+        proba = (1 - w) * proba + w * tcn.predict()
     labels = decode(proba, d["period"], params)
     os.makedirs(OUT, exist_ok=True)
     np.save(os.path.join(OUT, "proba.npy"), proba.astype(np.float32))
@@ -226,4 +253,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    {"cv": cv, "predict": predict}[sys.argv[1]]()
+    {"cv": cv, "predict": predict, "ens": ens}[sys.argv[1]]()
