@@ -1,0 +1,8 @@
+{
+  "cluster_scratch_kib": 10913580,
+  "cluster_code_kib": 375965,
+  "local_project_kib": 5162748,
+  "total_measured_gib": 15.690129280090332,
+  "cap_gib": 20,
+  "note": "Includes raw inputs, caches, environment, source and private backups on cluster and Mac; small shared uv package-cache downloads are additional and keep total below 20 GiB."
+}

@@ -1,5 +1,11 @@
 # Compute-first continuation
 
+Completed on November 16, 2026. All required tracking/metadata inputs, models,
+105 stress evaluations and audits are verified and backed up privately. The
+frozen submission reproduced twice exactly. CPU replay of all 105 cached cases
+took 14.6 seconds on the Mac, with no Torch or LightGBM installed. See the final
+entry in WORK_LOG.md for results, resource totals and remaining submission tasks.
+
 See [WORK_LOG.md](WORK_LOG.md) for the frozen source, data provenance, budget,
 job IDs, results and failures. This directory is added on a separate research
 branch. Nothing here changes the submitted possession-model pipeline.

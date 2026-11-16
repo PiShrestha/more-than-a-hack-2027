@@ -260,3 +260,62 @@ verification via HostKeyAlias=login.hpc.virginia.edu. No credentials, SSH config
 or host-key verification rules were changed. Collection/accounting helpers now
 accept an optional UVA_SSH_FRONTEND for this legitimate frontend selection.
 Fifteen complete stress reports were confirmed after recovery.
+
+## Completed compute phase — 2026-11-16
+
+All submitted experiment and audit jobs have finished. No active jobs remain.
+
+Frozen source branch possession-model remains at 602b613; original model, decoder,
+requirements, SOLUTION.md and submission CSV have no diff. Nothing was pushed.
+
+All 17 staged inputs are checksum-verified on Rivanna and in the private Mac
+backup. All seven IDSSE conversions are retained. Videos, homography and
+broadcast files were not needed and were not downloaded.
+
+Artifacts retained: 3 tree fold models, 18 CNN fold checkpoints, 49 original
+OOF probability files, and 105 stress-case archives with 840 member/ensemble
+probability matrices. These represent 15,039,660 frame evaluations but only
+SEVEN independent matches; noise seeds are repetitions.
+
+Frozen CSV regenerated twice on Linux and both outputs match the submitted
+SHA-256 exactly. Artifact backup verification passed; all probabilities and
+labels are aligned and finite.
+
+GPU/CPU spot checks: maximum probability difference 2.086e-6, minimum argmax
+agreement 1.0. CPU replay matched all saved scores exactly, and Linux/Mac replay
+rows are identical. Linux replay took 11 seconds; Mac replay took 14.55 seconds
+with neither Torch nor LightGBM installed in its isolated environment.
+
+Period audit reconstructed all paired baseline masks/scores exactly. Inserting
+a half separator changes at most 0.00255 spellF1 in an individual case; changes
+to case means are below 0.0004. Legacy means below remain the preregistered
+comparison; period-safe means are saved alongside them.
+
+| Missing-ball case | Ensemble spellF1 | smooth50 spellF1 |
+|---|---:|---:|
+| visible | 0.6942 | 0.2707 |
+| target_like | 0.6306 | 0.1876 |
+| iid40 | 0.6908 | 0.2451 |
+| burst2s40 | 0.6524 | 0.2028 |
+| burst10s40 | 0.6331 | 0.1895 |
+
+At about 40% removal, IID missingness has little effect (.6942 -> .6908),
+while 2-second and 10-second burst gaps reduce the mean to .6524 and .6331.
+The target-like pattern yields .6306. These are synthetic, selected-CV results,
+not a private BAR-ATH score or an untouched test. The target-like mask comes
+from licensed observations; exact template-dependent reproduction needs the
+permitted inputs and the mask itself must not be redistributed.
+
+Allocated cluster usage, including failures and cancellations: 3.1533 GPU-hours / 24 allowed; 19.4394 CPU core-hours / 32 allowed. Measured storage across cluster and local project: 15.69 GiB / 20 allowed.
+
+Final housekeeping removed 17 checksum-proven intermediate duplicates
+(629,264,810 bytes) from cluster home. A historical status file and an unmatched
+old rsync partial file were deliberately retained privately; they are not used
+by the pipeline. Root .gitignore now excludes all private research backups.
+
+Cheap remaining submission work: confirm registered team name, create renamed
+copies of CSV/doc, have the team review document wording, and designate the
+single Google Form submitter. No registration identity was guessed and no form
+was submitted. Further decoder/ensemble/uncertainty analyses can reuse cached
+probabilities without GPU training.
+

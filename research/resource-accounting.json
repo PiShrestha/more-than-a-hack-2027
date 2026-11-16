@@ -314,9 +314,9 @@
     },
     {
       "job": "23042379",
-      "state": "PENDING",
-      "seconds": 0,
-      "cpus": 0,
+      "state": "COMPLETED",
+      "seconds": 3,
+      "cpus": 1,
       "gpus": 0,
       "exit_code": "0:0"
     },
@@ -426,8 +426,8 @@
     },
     {
       "job": "23042378_14",
-      "state": "RUNNING",
-      "seconds": 288,
+      "state": "COMPLETED",
+      "seconds": 322,
       "cpus": 4,
       "gpus": 1,
       "exit_code": "0:0"
@@ -442,41 +442,49 @@
     },
     {
       "job": "23042378_16",
-      "state": "RUNNING",
-      "seconds": 83,
+      "state": "COMPLETED",
+      "seconds": 290,
       "cpus": 4,
       "gpus": 1,
       "exit_code": "0:0"
     },
     {
       "job": "23042378_17",
-      "state": "RUNNING",
-      "seconds": 83,
+      "state": "COMPLETED",
+      "seconds": 234,
       "cpus": 4,
       "gpus": 1,
       "exit_code": "0:0"
     },
     {
       "job": "23042378_18",
-      "state": "RUNNING",
-      "seconds": 21,
+      "state": "COMPLETED",
+      "seconds": 113,
       "cpus": 4,
       "gpus": 1,
       "exit_code": "0:0"
     },
     {
-      "job": "23042378_[19-20%6]",
-      "state": "PENDING",
-      "seconds": 0,
-      "cpus": 0,
-      "gpus": 0,
+      "job": "23042378_19",
+      "state": "COMPLETED",
+      "seconds": 335,
+      "cpus": 4,
+      "gpus": 1,
+      "exit_code": "0:0"
+    },
+    {
+      "job": "23042378_20",
+      "state": "COMPLETED",
+      "seconds": 288,
+      "cpus": 4,
+      "gpus": 1,
       "exit_code": "0:0"
     },
     {
       "job": "23042401",
-      "state": "PENDING",
-      "seconds": 0,
-      "cpus": 0,
+      "state": "COMPLETED",
+      "seconds": 11,
+      "cpus": 1,
       "gpus": 0,
       "exit_code": "0:0"
     },
@@ -490,9 +498,9 @@
     },
     {
       "job": "23042638",
-      "state": "PENDING",
-      "seconds": 0,
-      "cpus": 0,
+      "state": "COMPLETED",
+      "seconds": 40,
+      "cpus": 1,
       "gpus": 0,
       "exit_code": "0:0"
     },
@@ -503,10 +511,18 @@
       "cpus": 1,
       "gpus": 0,
       "exit_code": "0:0"
+    },
+    {
+      "job": "23043352",
+      "state": "COMPLETED",
+      "seconds": 3,
+      "cpus": 1,
+      "gpus": 0,
+      "exit_code": "0:0"
     }
   ],
-  "cpu_core_hours": 18.19361111111111,
-  "gpu_hours": 2.845833333333333,
+  "cpu_core_hours": 19.439444444444444,
+  "gpu_hours": 3.1533333333333333,
   "caps": {
     "cpu_core_hours": 32,
     "gpu_hours": 24,
