@@ -40,3 +40,26 @@ After completion, back up scratch outputs before cleanup. Private backups live
 under research/artifacts/ locally and are gitignored. Keep source, aggregate
 records, logs and dependency locks separately from licensed raw inputs. Do not
 publish BAR-ATH-derived frame arrays or any licensed match assets.
+
+## Completed expensive artifacts and later CPU work
+
+The latest submitted CSV reproduced byte-for-byte twice on Linux. The frozen
+hash is in reproduction-hashes.txt. All three LightGBM fold models and 18 CNN
+fold checkpoints are retained privately under artifacts/results/folds/.
+Original held-out predictions live under artifacts/data/external/idsse/.
+
+The fixed stress benchmark adds five observation patterns x seven matches x
+three corruption seeds. It retains per-member probabilities, the frozen
+ensemble, labels/periods for the open matches, and scoring reports. These are
+private experiment artifacts, not files to add to the submission branch.
+
+After the jobs complete, `replay.py` can evaluate cached probabilities with
+alternative decoder penalties or ensemble weights on CPU. It needs neither
+Torch nor LightGBM nor raw tracking; requirements-replay.txt gives the tested
+CPU dependencies. Defaults replay the frozen ensemble and do not change it.
+The only initial float32-only ensemble caches are from the first pilot; later
+caches retain float64 ensemble probabilities and decoded labels as well.
+
+Keep alternative settings in separate output files. Changing settings against
+these seven matches remains model selection, not independent test evaluation.
+No competition public labels are needed for these tasks.

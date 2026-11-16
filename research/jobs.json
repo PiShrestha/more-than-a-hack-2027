@@ -20,5 +20,8 @@
   "stress_summary": "23042379",
   "stress_array_1cpu_cancelled": "23042340",
   "stress_summary_cancelled": "23042341",
-  "cpu_replay": "23042401"
+  "cpu_replay": "23042401",
+  "artifact_audit": "23042558",
+  "period_audit": "23042638",
+  "failure_analysis": "23042752"
 }

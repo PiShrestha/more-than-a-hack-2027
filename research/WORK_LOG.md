@@ -211,3 +211,44 @@ and scoring. Released remaining array 23042378 from the completed CUDA gate
 its own CPU/GPU check. Summary 23042379 still waits for all 21 complete reports,
 including the resumable pilot 23042339. CPU-only cache replay 23042401 follows
 the summary and explicitly asserts that Torch was not imported.
+
+Slurm rejected replacement dependency `afterok:23038819` with a job-dependency
+error. After manually confirming all input, CUDA and full-sequence pilot gates,
+cleared the pending array dependency directly (`Dependency=0`). Readback showed
+no dependency, and tasks 23042378_1 and _2 were observed RUNNING. This corrects
+the earlier log wording: the completed job dependency itself was not accepted.
+
+Normalization note for future work: the TCN's convolutions have about 80 seconds
+of nominal receptive field, but GroupNorm also computes sequence-wide statistics
+for input shape (N,C,T). Training on 4096-frame chunks and inference on whole
+matches therefore use different normalization scopes. Stress inference keeps
+whole-match input shape and checks CPU/GPU agreement; it does not chunk the
+sequence for speed. This is a documentation/transfer limitation, not a change
+to the frozen model. PyTorch reference:
+https://docs.pytorch.org/docs/2.15/generated/torch.nn.GroupNorm.html
+
+Artifact audit 23042558 passed: 18 CNN fold checkpoints, three retained tree
+models, 49 original validation probability files; all training/validation match
+sets disjoint and all probabilities finite, normalized and correctly aligned.
+Period-boundary audit 23042638 is queued after CPU replay. It reconstructs the
+paired baseline independently and compares its scores against saved reports,
+then inserts an X separator between compact IDSSE halves and reports metric
+differences alongside the fixed original-scoring summary.
+
+The ungraded BAR-ATH intervals also enter whole-sequence CNN normalization,
+whereas the converted other-match records are compact halves. The current
+missingness experiment does not estimate that normalization-domain mismatch.
+This limitation remains for future investigation; it is not a reason to alter
+the frozen submission without separate validation.
+
+Failure analysis 23042752 completed in four seconds. Duration-stratified GT
+possession detection recall, averaged across IoU .3-.7: under 2s 0.2503
+(919 spells), 2-5s 0.5229 (934), 5-10s 0.7315 (569), 10-20s 0.8444 (369),
+and at least 20s 0.9422 (270). DFL definitions include shorter spells than the
+competition; these diagnostics do not justify increasing target-game switches
+without separate validation. Cached probabilities allow decoder trade-off
+analysis without further GPU training.
+
+Two monitoring attempts later received SSH key-exchange connection resets
+from login.hpc.virginia.edu. Jobs are unaffected; retry monitoring after a
+brief backoff rather than resubmitting work or changing credentials.
