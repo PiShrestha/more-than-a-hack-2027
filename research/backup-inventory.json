@@ -13,13 +13,13 @@
   "cpu_replay_max_spell_difference": 0.0,
   "cnn_fold_checkpoints": 18,
   "tree_fold_models": 3,
-  "research_commit": "9d2944ee442a7abc873fdf3ccf5aea1bc16d1ae1",
+  "research_commit": "eaafa292f95b6c00f98a0193a5fc052cb3c807c2",
   "verifier_sha256": "68df1dc352c83f7c7520d5e213108496f56331c5044d3d4c303905de2e654550",
   "files": [
     {
       "path": "cluster-status.txt",
-      "bytes": 15149,
-      "sha256": "02fe999b487b582f061d18148a6c7da039367ea23a58ba4ceb432fb9c379d423"
+      "bytes": 15366,
+      "sha256": "4ad00e5f61aed8d5074966bfb5a9ee2ac17add2094f8c8a9b57af84b1183c3a9"
     },
     {
       "path": "data/cache/BAR-ATH_tactical_atd.npz",
@@ -417,6 +417,11 @@
       "sha256": "aecec1ba5f021bb8d840bcb809b992a493f9aa10c8a77f72282527ef2c2e0af1"
     },
     {
+      "path": "logs/poss-clean-duplicate-23043352.log",
+      "bytes": 377,
+      "sha256": "ec6bbcb776b5d3f99fce23aaa22711f2032fc4dd843255836fc51d465439dcfc"
+    },
+    {
       "path": "logs/poss-cpu-replay-23042401.log",
       "bytes": 153,
       "sha256": "1d81015f9ef73b02fafbcd8b44b18d909661b7c20c8c849691af8e0d405238cd"
@@ -715,6 +720,11 @@
       "path": "results/dataset-summary.json",
       "bytes": 1052,
       "sha256": "448de30441809992044520256570ad8b6be61f1a6a7e6a72427057b992b08f59"
+    },
+    {
+      "path": "results/duplicate-cleanup.json",
+      "bytes": 334,
+      "sha256": "667d335163f90a13ea43943e2eb6f1a91fcc54250050c155a300a5f707fc44c5"
     },
     {
       "path": "results/environment-lock.txt",
