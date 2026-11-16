@@ -1,0 +1,35 @@
+{
+  "source": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "cohort": [
+    "J03WMX",
+    "J03WN1",
+    "J03WPY",
+    "J03WOH",
+    "J03WQQ",
+    "J03WOY",
+    "J03WR9"
+  ],
+  "cases": [
+    "compact",
+    "halves_independent",
+    "neutral_ungraded",
+    "observed_ungraded"
+  ],
+  "fixed": [
+    "all labelled play features",
+    "tree probabilities",
+    "fold model weights",
+    "ensemble weight",
+    "decoder"
+  ],
+  "variable": "CNN sequence context only",
+  "interior_margin_seconds": 60,
+  "target_context": "Automatic BAR-ATH observations outside published half blocks only; no BAR-ATH labels",
+  "output": "External-match probabilities and aggregate scores only; context feature vectors not exported",
+  "interpretation": "Selected-validation diagnostic; no automatic change to submission",
+  "budget": {
+    "gpu_hours_max": 1.75,
+    "cpu_core_hours_max": 1.84,
+    "new_storage_gib_estimate": 0.8
+  }
+}

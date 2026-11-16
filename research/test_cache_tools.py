@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from research.cache_tools import configuration,probability,separate_periods
+from research.cache_tools import configuration,probability,separate_periods,insert_context
 
 FROZEN=dict(switch=4,die=8,revive=32,tcn_weight=.75,tcn_tags=['','_s1'])
 
@@ -21,7 +21,7 @@ class CacheTests(unittest.TestCase):
     def test_invalid_settings_fail_instead_of_silently_changing_the_experiment(self):
         for override in ({'switch':-1},{'revive':float('nan')},{'tcn_weight':2},
                          {'tcn_tags':[]},{'tcn_tags':['','']},{'tcn_tags':['missing']},
-                         {'switch_cost':1},{'temp':0},{'die':True}):
+                         {'switch_cost':1},{'temp':0},{'die':True},[],False,''):
             with self.subTest(override=override),self.assertRaises(ValueError):
                 configuration(FROZEN,override)
 
@@ -31,6 +31,17 @@ class CacheTests(unittest.TestCase):
         a,b=separate_periods(gt,gt.copy(),period)
         np.testing.assert_array_equal(a,[0,0,3,1,1,3])
         np.testing.assert_array_equal(a,b)
+
+    def test_inserted_context_preserves_every_play_feature_and_row_mapping(self):
+        z=np.array([[10,11],[20,21],[30,31]],dtype=np.float32)
+        period=np.array([1,1,2])
+        context=[np.array([[-1,-2]]),np.array([[7,8],[9,10]]),np.empty((0,2))]
+        expanded,index=insert_context(z,period,context)
+        np.testing.assert_array_equal(index,[1,2,5])
+        np.testing.assert_array_equal(expanded[index],z)
+        np.testing.assert_array_equal(expanded[[0,3,4]],[[-1,-2],[7,8],[9,10]])
+        with self.assertRaises(ValueError):
+            insert_context(z,np.array([1,2,1]),context)
 
 if __name__=='__main__':
     unittest.main()

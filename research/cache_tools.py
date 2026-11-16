@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 def configuration(frozen,overrides=None):
-    overrides=overrides or {}
+    overrides={} if overrides is None else overrides
     if not isinstance(overrides,dict):
         raise ValueError('Decoder overrides must be an object')
     unknown=set(overrides)-{'switch','die','revive','temp','tcn_weight','tcn_tags'}
@@ -54,3 +54,20 @@ def separate_periods(gt,pred,period):
         aa.extend([gt[sel],np.array([3])])
         bb.extend([pred[sel],np.array([3])])
     return np.concatenate(aa).astype(np.int8),np.concatenate(bb).astype(np.int8)
+
+def insert_context(z,period,contexts):
+    """Insert unscored context around two compact halves without changing play features."""
+    if z.ndim!=2 or len(z)!=len(period) or len(contexts)!=3:
+        raise ValueError('Expected feature rows, periods and three context segments')
+    halves=[np.flatnonzero(period==p) for p in (1,2)]
+    if not all(len(x) for x in halves) or not np.array_equal(np.concatenate(halves),np.arange(len(period))):
+        raise ValueError('Expected two ordered compact halves')
+    if any(x.ndim!=2 or x.shape[1]!=z.shape[1] for x in contexts):
+        raise ValueError('Context feature widths differ')
+    before,middle,after=contexts
+    matrix=np.concatenate([before,z[halves[0]],middle,z[halves[1]],after])
+    index=np.concatenate([np.arange(len(halves[0]))+len(before),
+                          np.arange(len(halves[1]))+len(before)+len(halves[0])+len(middle)])
+    if not np.array_equal(matrix[index],z,equal_nan=True):
+        raise RuntimeError('Context insertion changed play features')
+    return matrix,index

@@ -28,6 +28,8 @@ def main():
     overrides={}
     if args.decoder is not None:
         overrides=json.loads(args.decoder.read_text())
+        if not isinstance(overrides,dict):
+            parser.error('Decoder overrides must be a JSON object')
     if args.tcn_weight is not None:
         overrides['tcn_weight']=args.tcn_weight
     try:
