@@ -1,7 +1,8 @@
 """Controlled CNN context probe using fixed external-match features and held-out models.
 
-Only automatic, ungraded BAR-ATH observations supply optional context. No BAR-ATH
-labels are loaded. Context feature vectors are not exported.
+Optional context uses automatic BAR-ATH feature rows at ungraded timestamps.
+Frozen preprocessing windows can reach observations across half boundaries.
+No BAR-ATH labels are loaded. Context feature vectors are not exported.
 """
 import hashlib
 import json

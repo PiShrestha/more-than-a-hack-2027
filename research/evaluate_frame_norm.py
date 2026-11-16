@@ -1,5 +1,6 @@
 """Compare one fixed per-frame-normalized CNN against the same-capacity stock base CNN."""
 import json
+import hashlib
 import os
 from pathlib import Path
 import sys
@@ -25,6 +26,7 @@ def main():
     torch.set_num_threads(int(os.environ['SLURM_CPUS_PER_TASK']))
     torch.backends.cudnn.allow_tf32=False
     ck=torch.load(work/'frame-norm'/f'fold-{fi}.pt',weights_only=False,map_location='cpu')
+    assert ck['protocol_hash']==hashlib.sha256((ROOT/'research/frame-norm-protocol.json').read_bytes()).hexdigest()
     assert match in ck['validation'] and match not in ck['train']
     net=FrameTCN(len(ck['mu']),ck['state']['inp.weight'].shape[0])
     net.load_state_dict(ck['state'])
@@ -64,6 +66,8 @@ def main():
         interior[idx[1500:-1500]]=True
     rows=[]
     for case in CASES:
+        if not np.isfinite(ps[case]).all():
+            raise RuntimeError('Non-finite candidate probabilities: '+case)
         with np.load(work/'context-probe'/match/f'{case}.npz') as old:
             stock=old['tcn_base']
             assert np.array_equal(old['y'],gt) and np.array_equal(old['period'],d['period'])

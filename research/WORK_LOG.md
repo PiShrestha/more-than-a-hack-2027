@@ -318,3 +318,147 @@ copies of CSV/doc, have the team review document wording, and designate the
 single Google Form submitter. No registration identity was guessed and no form
 was submitted. Further decoder/ensemble/uncertainty analyses can reuse cached
 probabilities without GPU training.
+
+## Continued analysis and submission preparation
+
+Official organizer submission email dated November 13 confirms the deadline is
+November 17, 2026, 23:59 CET = **17:59 America/New_York**. Found the official
+submission form. The registration confirmation did not contain the registered
+team name; requested that exact name from the user. No email or form was sent.
+
+Manual code review identified a precision confound in research/replay.py:
+penalty-only overrides unnecessarily recomputed the frozen ensemble from
+float32 member caches. Fixed the research replay helper to preserve the exact
+cached ensemble whenever mixture weight/member set is unchanged. Added validated
+configuration handling and optional period-safe scoring. Seven research tests
+pass, including exact invariance under unchanged mixture overrides. Frozen
+submission code and CSV remain unchanged.
+
+Queued CPU-only sensitivity job 23046173: 26 predeclared configurations x
+105 cases = 2,730 score evaluations. Variants change one penalty at a time,
+mixture weight, or member composition; they are descriptive sensitivity checks,
+not an automatic selection of a replacement model. Protocol is saved in
+sensitivity-protocol.json. The job requests one CPU, 4 GiB RAM and 30 minutes,
+with no GPU, within the remaining original CPU budget.
+
+Staged exact source CSV and unchanged document in private
+artifacts/submission-packages/review-staging/. The packaged CSV passes the
+official validator and preserves the submitted SHA-256. package_submission.py
+can create named copies once the exact registered team name is supplied.
+The manifest includes the verified deadline and form URL and explicitly marks
+team/document review outstanding. Form submission is not performed by this tool.
+
+Prepared solution-review.patch and a private proposed Markdown preview. The
+patch qualifies selected-CV claims, records separate reconstructed results,
+corrects the external dataset citation and mask-rotation wording, explains
+GroupNorm's global context, and records the frozen source/CSV hashes. It applies
+cleanly but has NOT been applied to SOLUTION.md. The team should review and
+rewrite the final wording as requested by the teammate.
+
+### Fixed normalization/context probe
+
+Context protocol committed before evaluation: four CNN sequence contexts on
+all seven external matches, fixed held-out fold models, unchanged play feature
+vectors, unchanged tree probabilities and decoder. Compare compact full match,
+independent halves, neutral standardized ungraded padding and observed automatic
+BAR-ATH context outside its published halves. No BAR-ATH labels are loaded; no
+context feature vectors are exported. Interior comparisons exclude 60 seconds
+from each half boundary to separate direct convolution-edge effects from the
+network's longer-range context dependence.
+
+Budget: seven one-GPU/one-CPU tasks, at most 15 minutes each, plus a five-minute
+CPU summary. Maximum new reservation 1.75 GPU-hours and 1.84 CPU core-hours;
+new storage estimated below 0.8 GiB across cluster and local backup. This remains
+within the cumulative 24 GPU-hour / 32 core-hour / 20 GiB caps.
+
+Pilot 23046726; remaining fold probe 23046727; summary 23046728.
+
+Context provenance clarification from code inspection: the inserted rows are
+selected at BAR-ATH ungraded timestamps, but the frozen feature extractor's
+rolling and gap features can reference automatic observations across half
+boundaries. Thus this is observed *feature context at ungraded times*, not
+features computed exclusively from ungraded raw observations. All observations
+are permitted automatic inputs and no BAR-ATH labels are read. No algorithm,
+case or parameter changed; the protocol wording has been corrected accordingly.
+
+The sensitivity study completed all 2,730 evaluations in 125.8 seconds. Under
+the same fixed decoder, target-like spellF1 was .63091 for the frozen six-CNN
+mixture, .62264 for the three-seed subset and .61257 for the base-network subset.
+Removing trees (all-CNN mixture) gave .62680; trees alone with the frozen mixed
+decoder gave .55508. These are conditional ablations, not comparisons after
+separately optimizing each model's decoder. Halving/doubling the team-switch
+penalty changed target-like spellF1 by about -.00354/-.00277. No replacement
+configuration was selected; the frozen submission is preserved.
+
+### Matched-capacity normalization ablation
+
+The context probe completed 28 evaluations. Observed ungraded feature context
+reduced period-safe external-match spellF1 from .63856 to .61745 (paired
+match-bootstrap delta -.02111, 95% interval [-.02838,-.01276]). Independent
+halves changed the mean by -.00035; neutral context by +.00190. Observed context
+changed 1.38% of interior argmax labels, even >60 seconds from half boundaries.
+The maximum compact CPU/GPU check discrepancy was 3.16e-6.
+
+This motivates one controlled research ablation, fixed in frame-norm-protocol.json
+before training: replace sequence-wide GroupNorm with the same channel grouping
+and affine parameters applied independently at each frame. Keep width 96, seed
+0, four noise realizations, 30 epochs, optimizer/sampling and decoder unchanged.
+Three original held-out folds; compare against the same-capacity stock base CNN
+on four context cases and all seven external matches. Only one training seed is
+used, so training variance remains a limitation. No BAR-ATH labels, no new
+submission prediction, and no change to the frozen model.
+
+Maximum additional reservation: 2.5 GPU-hours and 2.59 CPU core-hours, below
+the remaining cumulative caps; output storage estimated below 0.4 GiB. Unit
+check requires per-frame norm to be invariant to appended unrelated context;
+whole-CNN interior prediction differences must stay below .002. All trained
+checkpoint parameter shapes must match the stock base model.
+
+Training pilot 23047267; other folds 23047268; evaluations 23047269; summary 23047270.
+
+### Retained full-data tree and separate inference-scope candidate
+
+Queued CPU job 23047439, eight CPUs / 15 minutes / 32 GiB RAM (maximum two
+additional core-hours, no GPU). It fits and retains the original full-seven-match
+LightGBM model, checks save/reload predictions, then requires the committed
+stock CNN weights plus saved tree to reproduce the frozen CSV hash exactly.
+Only after that gate, it creates a separately named half-isolated CNN inference
+research candidate, keeping all features, tree probabilities, weights and decoder
+unchanged. Neither source submission file nor document is overwritten. No
+BAR-ATH label CSV is read and no target accuracy score is computed. The package
+tool remains pinned to the original submission hash.
+
+This saves the final tree for later CPU inference without retraining and makes
+the context-isolation proposal concrete, while preserving the official frozen
+submission and team review process.
+
+### Completed follow-up findings and submission staging
+
+All normalization jobs completed successfully. Per-frame normalization had zero
+interior probability change under every inserted-context condition. With the
+fixed tree mixture/decoder, compact spellF1 was .61675 versus .61420 for the
+same-capacity stock base CNN; the paired difference .00255 had interval
+[-.00805,.01273]. Under observed ungraded feature context the corresponding
+scores were .61541 versus .60300, a difference .01241 with interval
+[.00391,.01993]. This supports the context-invariance mechanism, but one seed
+on seven previously selected games does not establish an overall accuracy gain.
+No variant was selected and no extra ensemble training is justified by this run.
+
+Full-data tree job 23047439 completed in 5m19s. Its saved/reloaded probabilities
+were identical, and its original six-CNN inference regenerated the frozen CSV
+exactly. The half-isolated research candidate passed format validation and
+differed on 2,386 active frames; this is a prediction disagreement count, not
+an accuracy comparison. No BAR-ATH label score was computed. A separate
+CPU repeat job 23048161 reuses the saved tree and requires byte-identical
+original/candidate CSV hashes across two inference runs. Maximum reservation
+is two additional CPU core-hours, zero GPU-hours.
+
+The user confirmed the registered team name `encara_messi`. The original CSV
+and frozen technical-document draft have been staged as encara_messi.csv and
+encara_messi.md under the private submission package directory. The CSV hash
+is checked before packaging and the validator passed (199,319 frames). A
+separate PROPOSED_encara_messi_FOR_TEAM_REVIEW.md is generated from the clean
+solution-review.patch; it is not applied to the frozen source or substituted
+for the team-reviewed document. The team still needs to review its wording and
+designate a single form submitter before November 17, 2026 at 23:59 CET /
+17:59 America/New_York. No form was sent and no branch was pushed.

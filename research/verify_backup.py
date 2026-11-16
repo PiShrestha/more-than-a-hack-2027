@@ -65,6 +65,40 @@ def main():
     assert len(replay['rows'])==105
     max_macro=max(abs(r['macro_f1']-json.loads((results/'stress'/f"{r['match']}-seed{r['seed']}"/'report.json').read_text())['rows'][list(CASES).index(r['case'])]['ensemble']['macro_f1']) for r in replay['rows'])
     max_spell=max(abs(r['spell_f1_mean']-json.loads((results/'stress'/f"{r['match']}-seed{r['seed']}"/'report.json').read_text())['rows'][list(CASES).index(r['case'])]['ensemble']['spell_f1_mean']) for r in replay['rows'])
+    assert max_macro == 0 and max_spell == 0
+    # Audit the new context caches independently of the GPU jobs that wrote them.
+    context_files = 0
+    for item in cohort:
+        match = item['match']
+        with np.load(root/'data/external/idsse'/f'{match}.npz') as raw:
+            gt = np.where(raw['y'] < 0, 3, raw['y'])
+            period = raw['period']
+        for family, keys in [('context-probe', ['ensemble'] + members[2:]),
+                             ('frame-norm', ['frame_norm', 'stock_base', 'lightgbm'])]:
+            for case in ('compact', 'halves_independent', 'neutral_ungraded', 'observed_ungraded'):
+                with np.load(results/family/match/f'{case}.npz') as d:
+                    assert np.array_equal(d['y'], gt) and np.array_equal(d['period'], period)
+                    assert d['interior'].shape == gt.shape and d['interior'].dtype == np.dtype(bool)
+                    for key in keys:
+                        p = d[key]
+                        assert p.shape == (len(gt), 3) and np.isfinite(p).all()
+                        assert p.min() >= 0 and p.max() <= 1+1e-7
+                        assert np.allclose(p.sum(1), 1, rtol=0, atol=1e-6)
+                context_files += 1
+    assert context_files == 56
+    assert len(list((results/'frame-norm').glob('fold-*.pt'))) == 3
+    normalization = json.loads((results/'frame-norm-summary.json').read_text())
+    assert normalization['evaluations'] == 56 and normalization['max_frame_norm_interior_context_error'] < .002
+    sensitivity = json.loads((results/'sensitivity/summary.json').read_text())
+    assert sensitivity['selected_configuration'] is None
+    final = results/'final-tree'
+    reproduced = json.loads((final/'candidate-reproduction.json').read_text())
+    assert reproduced['status'] == 'passed' and reproduced['repeats'] >= 2
+    for filename, key in [('model.txt', 'saved_tree_sha256'),
+                          ('frozen-replay.csv', 'frozen_csv_sha256'),
+                          ('half-isolated-research-candidate.csv', 'candidate_csv_sha256')]:
+        assert digest(final/filename) == reproduced[key]
+    assert reproduced['frozen_csv_sha256'] == digest(ROOT/'submission/submission.csv')
     inventory=[]
     for path in sorted(root.rglob('*')):
         if not path.is_file() or 'partial-backups' in path.parts:
@@ -76,6 +110,8 @@ def main():
         frame_evaluations=total_frames,independent_matches=7,noise_seeds=list(SEEDS),
         cpu_replay_max_macro_difference=max_macro,cpu_replay_max_spell_difference=max_spell,
         cnn_fold_checkpoints=18,tree_fold_models=3,
+        additional_context_cache_files=context_files,frame_norm_fold_checkpoints=3,
+        retained_final_tree=True,research_candidate_reproduced=True,
         research_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         verifier_sha256=digest(Path(__file__)),files=inventory)
     (ROOT/'research/backup-inventory.json').write_text(json.dumps(result,indent=2)+'\n')

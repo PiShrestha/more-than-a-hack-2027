@@ -42,6 +42,10 @@ def main():
         net,stats=tcn.fit(series,'cuda')
     finally:
         tcn.TCN=original
+    if not all(torch.isfinite(p).all().item() for p in net.parameters()):
+        raise RuntimeError('Training produced non-finite model parameters')
+    if not all(torch.isfinite(torch.as_tensor(v)).all().item() for v in stats):
+        raise RuntimeError('Training produced non-finite feature statistics')
     settings=dict(normalization='per-frame channel-group normalization',seed=0,
                   realisations=4,epochs=30,width=96,optimizer_and_sampling='unchanged possession.tcn.fit',
                   gpu=torch.cuda.get_device_name(),torch=torch.__version__,seconds=time.time()-started,

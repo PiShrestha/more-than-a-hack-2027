@@ -1,6 +1,6 @@
 # Compute-first continuation
 
-Completed on November 16, 2026. All required tracking/metadata inputs, models,
+Research checkpoint: November 16, 2026. All required tracking/metadata inputs, models,
 105 stress evaluations and audits are verified and backed up privately. The
 frozen submission reproduced twice exactly. CPU replay of all 105 cached cases
 took 14.6 seconds on the Mac, with no Torch or LightGBM installed. See the final
@@ -69,3 +69,28 @@ caches retain float64 ensemble probabilities and decoded labels as well.
 Keep alternative settings in separate output files. Changing settings against
 these seven matches remains model selection, not independent test evaluation.
 No competition public labels are needed for these tasks.
+
+## November 16 follow-up artifacts
+
+The CPU sensitivity study evaluated 26 predefined configurations on all 105
+stress cases. Controlled context probes retained 28 external-match prediction
+archives, and the matched-capacity per-frame normalization experiment retained
+three additional fold checkpoints and 28 prediction archives. These are research
+diagnostics on the same seven selected validation matches. No alternative model
+was selected for submission. See WORK_LOG.md for results and limitations.
+
+The final original LightGBM model is now saved under
+`artifacts/results/final-tree/model.txt`. It reproduces the original submission
+with the committed six CNNs and avoids retraining for later inference. A
+separately named half-isolated research candidate is retained in that directory;
+it is not the official submission and has not been evaluated against BAR-ATH
+labels. Its generating scripts are research code on this local branch.
+
+The registered team name supplied by the user is `encara_messi`. Exact frozen
+submission copies are staged privately in
+`artifacts/submission-packages/encara_messi/`, alongside a proposed document for
+team review. `package_submission.py --team-name encara_messi` validates and
+stages them without overwriting edits. The submission deadline is November 17,
+2026, 23:59 CET / 17:59 America/New_York. One designated team member still needs
+to complete the Google Form after reviewing the document. Nothing has been
+pushed or submitted.
