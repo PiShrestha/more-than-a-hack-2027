@@ -1,0 +1,54 @@
+{
+  "source": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "hypothesis": "Per-frame channel-group normalization removes distant sequence-context dependence; evaluate accuracy tradeoff.",
+  "normalization": {
+    "stock": "GroupNorm across channel groups and time",
+    "candidate": "Same channel groups and affine parameters, independently per time step",
+    "groups": 8,
+    "eps": 1e-05
+  },
+  "training": {
+    "width": 96,
+    "epochs": 30,
+    "noise_realisations": 4,
+    "seed": 0,
+    "folds": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6
+      ]
+    ],
+    "recipe": "unchanged possession.tcn.fit"
+  },
+  "evaluation": {
+    "cases": [
+      "compact",
+      "halves_independent",
+      "neutral_ungraded",
+      "observed_ungraded"
+    ],
+    "tree_weight": 0.25,
+    "decoder": {
+      "switch": 4,
+      "die": 8,
+      "revive": 32
+    },
+    "interior_margin_seconds": 60
+  },
+  "implementation_sha256": "172b59e2e74001a52a9cc4635d3af035bd8a0bf5c7941d56c664479a5bd09ab5",
+  "note": "Research ablation, one seed, no automatic model selection and no BAR-ATH labels.",
+  "budget": {
+    "gpu_hours_max": 2.5,
+    "cpu_core_hours_max": 2.59,
+    "new_storage_gib_estimate": 0.4
+  }
+}
