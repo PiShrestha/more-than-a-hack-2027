@@ -7,6 +7,9 @@ python -m possession.idsse                       # convert IDSSE XML -> cached a
 # python -W ignore -m possession.model cv        # optional: LightGBM held-out probabilities
 # python -W ignore -m possession.tcn cv          # optional (GPU): TCN held-out probabilities
 # python -W ignore -m possession.model ens       # optional: re-derives possession/decoder.json (mix weight + penalties), committed
-# python -W ignore -m possession.tcn train       # optional (GPU, ~5 min): re-trains possession/tcn.pt, which is committed
+# optional (GPU, ~5 min each): re-train the six committed CNNs possession/tcn*.pt
+# python -W ignore -m possession.tcn train
+# for v in r8:TCN_REAL=8 e60:TCN_EPOCHS=60 w128:TCN_WIDTH=128 s1:TCN_SEED=1 s2:TCN_SEED=2; do
+#   env TCN_TAG=_${v%%:*} ${v#*:} python -W ignore -m possession.tcn train; done
 python -W ignore -m possession.model predict     # train LightGBM on all 7 IDSSE matches, mix with the TCN, write the submission
 python evaluation/validate_submission.py submission/submission.csv

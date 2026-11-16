@@ -19,8 +19,9 @@ No label of any kind from BAR-ATH is used for training, tuning or model selectio
 | LightGBM alone, IDSSE held-out, argmax without decoding | 0.334 | |
 | LightGBM alone, IDSSE held-out, Viterbi decoded | 0.573 | 0.886 |
 | temporal CNN alone, IDSSE held-out, Viterbi decoded | 0.611 | 0.906 |
-| **ensemble, IDSSE held-out, Viterbi decoded (submitted)** | **0.622** | **0.908** |
-| ensemble, BAR-ATH public 5 minutes (sanity check only) | 0.715 | 0.890 |
+| LightGBM + one temporal CNN, IDSSE held-out | 0.622 | 0.908 |
+| **LightGBM + six temporal CNNs, IDSSE held-out (submitted)** | **0.637** | **0.913** |
+| submitted ensemble, BAR-ATH public 5 minutes (sanity check only) | 0.715 | 0.908 |
 | official baseline `smooth50`, BAR-ATH public 5 minutes | 0.326 | 0.621 |
 
 The BAR-ATH public window has 17 possessions and is reported only to show the pipeline is
@@ -117,16 +118,19 @@ original and the team-swapped view, so neither side gets a learned bias.
 non-causal dilated 1-D CNN over the same 111 features (10 residual blocks, dilations 1 to 512,
 width 96, receptive field about 80 s) sees a whole gap and both of its edges at once. It is trained
 with cross-entropy on 4096-frame chunks of 4 noise realisations per match, both team orientations,
-for 30 epochs on one GPU, and symmetrised like LightGBM. The trained weights (`possession/tcn.pt`,
-1.5 MB) are committed and inference runs on CPU, so the submission does not depend on GPU
+for 30 epochs on one GPU, and symmetrised like LightGBM. Six such networks are averaged: the base
+one, two more seeds, one with 8 noise realisations, one with 60 epochs and one of width 128. Seed
+to seed variance was as large as any single change, so averaging is what pays. The trained weights
+(`possession/tcn*.pt`, 1.5 to 2.7 MB each) are committed and inference runs on CPU, so the submission does not depend on GPU
 floating point.
 
 ### 5. Ensemble and decoding into possessions
 
-The two models' probabilities are mixed linearly, with weight 0.75 on the CNN. The decoder is a
+The LightGBM probabilities and the mean of the six CNNs are mixed linearly, with weight 0.75 on
+the CNNs. The decoder is a
 Viterbi path over `H`, `A` and `D` using log-probabilities, with penalties for an `H`/`A` switch,
 for alive to dead, and for dead to alive. The mixing weight and penalties
-(`possession/decoder.json`: switch 8, die 4, revive 32) were chosen jointly by grid search
+(`possession/decoder.json`: switch 4, die 8, revive 32) were chosen jointly by grid search
 maximising mean spellF1 on held-out IDSSE matches (3 folds over the 7 matches, with the official
 `possession_metrics.py`). Both models' held-out probabilities come from the same folds and the
 same validation noise. Every graded frame gets a label. We do not abstain, because under
@@ -161,14 +165,17 @@ each version only to confirm the pipeline still aligned.
 | v5b | every frame instead of every third | 0.560 (no gain) | |
 | v5 | 1600 rounds, wider decoder grid | 0.573 | 42.5% |
 | v5c | 3 noise realisations per match for LightGBM | 0.574 (no gain) | |
-| **v6** | **temporal CNN, ensembled 0.75 with v5 (submitted)** | **0.622** | **43.0%** |
+| v6 | temporal CNN, ensembled 0.75 with v5 | 0.622 | 43.0% |
+| v7a | CNN variants alone (8 realisations, width 128) in the ensemble | 0.629, 0.628 | |
+| v7b | three CNN seeds averaged | 0.633 | |
+| **v7** | **six CNNs averaged, ensembled 0.75 with v5 (submitted)** | **0.637** | **43.2%** |
 
 ## Limitations
 
 - **Possession granularity.** DFL possessions are shorter (mean 6.7 s) than this challenge's
   (14.2 s in the public window), so a decoder tuned on DFL may switch differently from Metrica's
   ground truth. On held-out IDSSE we predict 0.73 times the true possession count. On BAR-ATH we
-  predict 315 possessions with a mean of 11.5 s.
+  predict 318 possessions with a mean of 11.3 s.
 - **Long ball gaps.** Team accuracy on held-out IDSSE is 0.91 with the ball visible and 0.83
   without it (0.90 and 0.77 for LightGBM alone). Most of the remaining error is here.
 - **One noise model.** The ball mask comes from BAR-ATH, but its correlation with game state, such
@@ -206,5 +213,5 @@ runs give a byte-identical file, also from a fresh clone, environment and downlo
 | `possession/idsse.py` | IDSSE XML to the same arrays plus labels, via kloppy |
 | `possession/features.py` | per-frame features |
 | `possession/model.py` | noise model, LightGBM, Viterbi, cross-validation, ensemble, prediction |
-| `possession/tcn.py`, `possession/tcn.pt` | temporal CNN and its trained weights |
+| `possession/tcn.py`, `possession/tcn*.pt` | temporal CNN and the six trained networks |
 | `possession/fetch_idsse.sh`, `run.sh` | download and end-to-end run |

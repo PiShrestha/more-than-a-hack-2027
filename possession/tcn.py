@@ -23,11 +23,13 @@ from possession.data import bar_ath  # noqa: E402
 from possession.features import features  # noqa: E402
 from possession.model import add_noise, bar_ath_ball_mask, SEED  # noqa: E402
 
-WEIGHTS = os.path.join(ROOT, "possession", "tcn.pt")
+TAG = os.environ.get("TCN_TAG", "")  # experiment / ensemble-member suffix
+WEIGHTS = os.path.join(ROOT, "possession", "tcn{}.pt".format(TAG))
+TSEED = int(os.environ.get("TCN_SEED", SEED))
 N_REAL = int(os.environ.get("TCN_REAL", 4))  # noise realisations per training match
 CHUNK = 4096
 EPOCHS = int(os.environ.get("TCN_EPOCHS", 30))
-WIDTH = 96
+WIDTH = int(os.environ.get("TCN_WIDTH", 96))
 DILATIONS = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
 
 
@@ -71,7 +73,7 @@ def _realisations(matches, mask, n, seed):
 
 
 def fit(series, device, log=print):
-    torch.manual_seed(SEED)
+    torch.manual_seed(TSEED)
     allX = np.concatenate([X for X, _ in series])
     stats = (np.nanmean(allX, 0), np.nanstd(allX, 0) + 1e-3)
     data = [(torch.from_numpy(_prep(X, stats)), torch.from_numpy(y)) for X, y in series]
@@ -79,7 +81,7 @@ def fit(series, device, log=print):
     opt = torch.optim.AdamW(net.parameters(), lr=2e-3, weight_decay=1e-2)
     steps_per_epoch = sum(len(y) for _, y in data) // (CHUNK * 8)
     sched = torch.optim.lr_scheduler.OneCycleLR(opt, 2e-3, total_steps=EPOCHS * steps_per_epoch)
-    gen = np.random.default_rng(SEED)
+    gen = np.random.default_rng(TSEED)
     lossf = nn.CrossEntropyLoss(ignore_index=-1)
     for ep in range(EPOCHS):
         net.train()
@@ -123,7 +125,7 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
     for fold in folds:
         val = [idsse.MATCHES[i] for i in fold]
         tr = [m for m in idsse.MATCHES if m not in val]
-        net, stats = fit(_realisations(tr, mask, N_REAL, SEED), device)
+        net, stats = fit(_realisations(tr, mask, N_REAL, TSEED), device)
         rng = np.random.default_rng(SEED + 1)  # identical validation noise to model.cv
         for m in idsse.MATCHES:
             d = add_noise(idsse.load(m), mask, rng) if m in val else None
@@ -132,29 +134,33 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
             p = proba_sym(net, stats, d)
             y = d["y"]
             print("{} frame acc {:.3f}".format(m, (p.argmax(1) == y)[y >= 0].mean()), flush=True)
-            np.savez(os.path.join(idsse.SRC, "cvtcn_{}.npz".format(m)), p=p, y=y,
+            np.savez(os.path.join(idsse.SRC, "cvtcn{}_{}.npz".format(TAG, m)), p=p, y=y,
                      period=d["period"], bvis=~np.isnan(d["bx"]))
 
 
 def train():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    net, stats = fit(_realisations(list(idsse.MATCHES), bar_ath_ball_mask(), N_REAL, SEED), device)
+    net, stats = fit(_realisations(list(idsse.MATCHES), bar_ath_ball_mask(), N_REAL, TSEED), device)
     torch.save({"state": net.state_dict(), "mu": stats[0], "sd": stats[1]}, WEIGHTS)
     print("wrote", WEIGHTS)
 
 
-def load_net(n_in):
-    ck = torch.load(WEIGHTS, weights_only=False)
-    net = TCN(n_in)
+def load_net(n_in, tag=TAG):
+    ck = torch.load(os.path.join(ROOT, "possession", "tcn{}.pt".format(tag)), weights_only=False)
+    net = TCN(n_in, ck["state"]["inp.weight"].shape[0])
     net.load_state_dict(ck["state"])
     return net.eval(), (ck["mu"], ck["sd"])
 
 
-def predict():
+def predict(tags=("",)):
+    """BAR-ATH probabilities, averaged over the committed ensemble members."""
     d = bar_ath()
     X, _ = features(d)
-    net, stats = load_net(X.shape[1])
-    return proba_sym(net, stats, d)
+    out = []
+    for tag in tags:
+        net, stats = load_net(X.shape[1], tag)
+        out.append(proba_sym(net, stats, d))
+    return np.mean(out, 0)
 
 
 if __name__ == "__main__":

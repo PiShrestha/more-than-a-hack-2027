@@ -209,19 +209,24 @@ def cv(folds=((0, 1), (2, 3), (4, 5, 6))):
     print("wrote", DECODER, best)
 
 
-def ens(lgb_tag="", weights=(0.0, 0.5, 0.6, 0.75, 1.0)):
-    """Tune the LightGBM/TCN mixing weight jointly with the decoder on the saved CV probabilities."""
+def ens(lgb_tag="", weights=(0.0, 0.5, 0.6, 0.75, 0.9, 1.0)):
+    """Tune the LightGBM/TCN mixing weight jointly with the decoder on the saved CV probabilities.
+
+    ENS_TCN is a "+"-separated list of TCN tags whose probabilities are averaged (default: "").
+    """
+    tags = os.environ.get("ENS_TCN", "").split("+")
     load = lambda pre, m: np.load(os.path.join(idsse.SRC, "{}_{}.npz".format(pre, m)))
     results = []
     for w in weights:
         probas = []
         for m in idsse.MATCHES:
-            a, b = load("cv" + lgb_tag, m), load("cvtcn", m)
-            assert (a["y"] == b["y"]).all()
-            probas.append(((1 - w) * a["p"] + w * b["p"], a["y"], a["period"]))
+            a = load("cv" + lgb_tag, m)
+            pt = np.mean([load("cvtcn" + t, m)["p"] for t in tags], 0)
+            probas.append(((1 - w) * a["p"] + w * pt, a["y"], a["period"]))
         for params in GRID:
             s = np.array([score(np.where(y < 0, 3, y), decode(p, per, params)) for p, y, per in probas], float)
-            results.append((s[:, 0].mean(), s[:, 1].mean(), s[:, 2].sum() / s[:, 3].sum(), dict(params, tcn_weight=w)))
+            results.append((s[:, 0].mean(), s[:, 1].mean(), s[:, 2].sum() / s[:, 3].sum(),
+                            dict(params, tcn_weight=w, tcn_tags=tags)))
         best_w = max((r for r in results if r[3]["tcn_weight"] == w), key=lambda r: r[0])
         print("tcn_weight {:.2f}: best spellF1 {:.4f} macroF1 {:.4f} {}".format(w, *best_w[:2], best_w[3]), flush=True)
     best = max(results, key=lambda r: r[0])
@@ -240,7 +245,7 @@ def predict():
     w = params.get("tcn_weight", 0.0)
     if w > 0:
         from possession import tcn
-        proba = (1 - w) * proba + w * tcn.predict()
+        proba = (1 - w) * proba + w * tcn.predict(params.get("tcn_tags", [""]))
     labels = decode(proba, d["period"], params)
     os.makedirs(OUT, exist_ok=True)
     np.save(os.path.join(OUT, "proba.npy"), proba.astype(np.float32))
