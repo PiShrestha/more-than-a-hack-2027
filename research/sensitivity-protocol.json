@@ -1,0 +1,483 @@
+{
+  "source": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "cohort": [
+    "J03WMX",
+    "J03WN1",
+    "J03WPY",
+    "J03WOH",
+    "J03WQQ",
+    "J03WOY",
+    "J03WR9"
+  ],
+  "seeds": [
+    101,
+    202,
+    303
+  ],
+  "cases": [
+    "visible",
+    "target_like",
+    "iid40",
+    "burst2s40",
+    "burst10s40"
+  ],
+  "configs": [
+    {
+      "name": "frozen",
+      "group": "reference",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "switch_x0.5",
+      "group": "penalty",
+      "params": {
+        "switch": 2.0,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "switch_x0.75",
+      "group": "penalty",
+      "params": {
+        "switch": 3.0,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "switch_x1.5",
+      "group": "penalty",
+      "params": {
+        "switch": 6.0,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "switch_x2",
+      "group": "penalty",
+      "params": {
+        "switch": 8.0,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "die_x0.5",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 4.0,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "die_x0.75",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 6.0,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "die_x1.5",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 12.0,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "die_x2",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 16.0,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "revive_x0.5",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 16.0,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "revive_x0.75",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 24.0,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "revive_x1.5",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 48.0,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "revive_x2",
+      "group": "penalty",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 64.0,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "tcn_weight_0",
+      "group": "mixture",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.0,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "tcn_weight_0.25",
+      "group": "mixture",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.25,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "tcn_weight_0.5",
+      "group": "mixture",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.5,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "tcn_weight_0.9",
+      "group": "mixture",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.9,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "tcn_weight_1",
+      "group": "mixture",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 1.0,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "base_only",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          ""
+        ]
+      }
+    },
+    {
+      "name": "three_seeds",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_base",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_r8",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_e60",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_e60",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_w128",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_w128",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_s1",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_s1",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s2"
+        ]
+      }
+    },
+    {
+      "name": "without_s2",
+      "group": "members",
+      "params": {
+        "switch": 4,
+        "die": 8,
+        "revive": 32,
+        "tcn_weight": 0.75,
+        "tcn_tags": [
+          "",
+          "_r8",
+          "_e60",
+          "_w128",
+          "_s1"
+        ]
+      }
+    }
+  ],
+  "period_safe": true,
+  "purpose": "Sensitivity analysis only; no decoder selection and no target-game labels.",
+  "precision": "Penalty-only variants reuse cached ensemble precision. Mixture variants average quantized member probabilities in float64."
+}
