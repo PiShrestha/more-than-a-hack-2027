@@ -1,0 +1,115 @@
+[
+  {
+    "path": "tactical/BAR-ATH_tactical_atd.txt",
+    "size": 195714285,
+    "sha256": "f130e350d2bfdf734b7e32f072931fccc6d015c1e837d082064875fe0a700431"
+  },
+  {
+    "path": "tactical/BAR-ATH_tactical_atd.xml",
+    "size": 59057,
+    "sha256": "327e35e32e46a647389b88f883d4f9a2ab931e3e6148aef2fcf8f22b1e93c43a"
+  },
+  {
+    "path": "tactical/BAR-ATH_tactical_smart_tagging.xml",
+    "size": 261055,
+    "sha256": "0594d35e3df01b9c5002372d8615e2e8ef5379ac8f4e84c5ef7a53f4304c9019"
+  },
+  {
+    "path": "external/idsse/J03WMX_meta.xml",
+    "size": 11930,
+    "md5": "bc5d5b21dbcf36aa30f4cd0428309f6b",
+    "sha256": "a884728647a564cf8b20e5223a1d04a5da6f6725e1e506c8651505327c197ba9",
+    "source_id": 51643475
+  },
+  {
+    "path": "external/idsse/J03WMX_tracking.xml",
+    "size": 418524833,
+    "md5": "e4273a2adf5dbd9d4ec42def2f01905c",
+    "sha256": "d3dd92e509421a6466acb0a083c009035f1751bc5fd9ef42ffa8f20d01cf7d49",
+    "source_id": 51643514
+  },
+  {
+    "path": "external/idsse/J03WN1_meta.xml",
+    "size": 11722,
+    "md5": "37b0f85588c0acfb995fe633c7ac2e0d",
+    "sha256": "5490286436c86e6f80a538d2b1b379d0efd016e0defcaf594bc59d9ef5079f4c",
+    "source_id": 51643472
+  },
+  {
+    "path": "external/idsse/J03WN1_tracking.xml",
+    "size": 391722803,
+    "md5": "bacb2f609c1d1b0bfc906f6b9d4109f2",
+    "sha256": "56ef948961a18e150dba0b7b16869d0008ff66f3050a0c355d31fa5b8ec2fcec",
+    "source_id": 51643517
+  },
+  {
+    "path": "external/idsse/J03WPY_meta.xml",
+    "size": 11922,
+    "md5": "65a4568e4f374af94d3c1015cbc7c4f5",
+    "sha256": "566dd5e4c86e124ab90fcdba51100881f0436e22afa71832945a451a2d95a420",
+    "source_id": 51643487
+  },
+  {
+    "path": "external/idsse/J03WPY_tracking.xml",
+    "size": 371688499,
+    "md5": "e56ff1336a334f8da51110fbe7cab764",
+    "sha256": "845202c29ad93d696653436da426a7cdaefb848298e07b7343de6529581671e1",
+    "source_id": 51643526
+  },
+  {
+    "path": "external/idsse/J03WOH_meta.xml",
+    "size": 11745,
+    "md5": "b9710781d400dd812f62b0a6e3d7bce8",
+    "sha256": "f23b3ee13b988b1ff9a0bce438c416dac47e71355bbc7ee1dab21aaf3e33c18c",
+    "source_id": 51643478
+  },
+  {
+    "path": "external/idsse/J03WOH_tracking.xml",
+    "size": 348945715,
+    "md5": "3efff25a86a61768e7d253b4bba137a3",
+    "sha256": "ec4dcf30200aad694dea263d5289485fcd0ca42badddaeb7c81f5cd5a4229d4f",
+    "source_id": 51643520
+  },
+  {
+    "path": "external/idsse/J03WQQ_meta.xml",
+    "size": 11932,
+    "md5": "5979209af316a914ce57347d0633df6c",
+    "sha256": "e976aa0c5dba862cfa898ea57ec226efce9d1bc04b23b8d775908db86aa6fa41",
+    "source_id": 51643484
+  },
+  {
+    "path": "external/idsse/J03WQQ_tracking.xml",
+    "size": 356219423,
+    "md5": "9105bad987191d3c3c362c1fce9a4fcd",
+    "sha256": "cbefcb0bd7f39f3b94ee69a7bc97aac0f936425062c1cc1b144733df36804d6f",
+    "source_id": 51643529
+  },
+  {
+    "path": "external/idsse/J03WOY_meta.xml",
+    "size": 11952,
+    "md5": "7b021e577fca917a63111d55cc29ae5b",
+    "sha256": "4c497fac683eee8292901c18ca02c0be1d9609d0b9d4bd8aa092c61f9e0b19e9",
+    "source_id": 51643481
+  },
+  {
+    "path": "external/idsse/J03WOY_tracking.xml",
+    "size": 362567859,
+    "md5": "4e1063e0a0ae499920cf68ac1aa3ab4e",
+    "sha256": "a228ef0e676d009cefff1580fcb721b53f598454eb120ec347e0a628a3a4646b",
+    "source_id": 51643523
+  },
+  {
+    "path": "external/idsse/J03WR9_meta.xml",
+    "size": 11823,
+    "md5": "5e2d580d3d8ed97e32959de90d04992b",
+    "sha256": "429b584e89df3e3e8b81f4bd0d004b38bd0b4298bb390b8fb43efccb60963e01",
+    "source_id": 51643490
+  },
+  {
+    "path": "external/idsse/J03WR9_tracking.xml",
+    "size": 372934140,
+    "md5": "e060bb7d7a5a3bfbd15bbf9bc631024d",
+    "sha256": "70b63069189019066fb7e3d9db891122edfe787f3a43ba522ebe45ed89ea0269",
+    "source_id": 51643532
+  }
+]

@@ -101,3 +101,89 @@ input/cached data into gitignored research/artifacts/. Source inspection confirm
 the 14 required external XML files total 2,622,686,298 bytes; availability of all
 14 on the cluster remains unconfirmed until monitoring is restored. The local
 frozen submission hash and all original model/source files remain unchanged.
+
+## Access restored; verified results and recovery
+
+User authorised up to **24 GPU-hours**. CPU cap remains 32 core-hours and
+storage cap 20 GiB.
+
+- Setup 23038805 completed in 10m07s. All 17 staged input files (three tactical,
+  14 external) passed checksums; all seven IDSSE matches converted.
+- Reproduction 23038817 completed in 6m34s. BOTH regenerated CSVs match the
+  frozen SHA-256 exactly. This verifies latest six-CNN inference on Linux.
+- CUDA smoke 23038819 completed in six seconds on A100-SXM4-80GB.
+- LGB CV 23038818 timed out at 1h00m24s. Only J03WMX and J03WN1 predictions
+  persisted. Their expensive computation will be reused.
+- Original aggregate 23038821 was cancelled due to the failed dependency.
+- Original GPU array 23038820 had not started; its A100-only estimate was
+  November 18, after the deadline. Cancelled that pending array, without GPU use.
+- Resumable LGB array 23041361: fold zero reuses saved probabilities; remaining
+  folds run separately, retain models, and omit the unnecessary decoder grid.
+  Four CPUs, 30 min per task (two actual training tasks plus a quick reuse task).
+- Replacement GPU array 23041362: one CPU, 48 GiB RAM, one GPU, 2h50m per task;
+  six tasks with up to three concurrent. Compatible A100/A40/A6000/B200/RTX Pro
+  6000 nodes are eligible; V100 is excluded by feature constraints. Maximum
+  GPU reservation 17 hours, within the revised 24-hour cap. CPU wall-time
+  reservations plus prior allocated usage stay approximately 31.1 core-hours.
+
+A private local backup of all inputs, caches, results and logs is in progress.
+No submitted model or decoder was changed. Reconstructed CV scores may differ
+from the original GPU training because its kernels were not made bit-deterministic.
+
+### Shorter fold jobs for backfill
+
+Pending array 23041362 and dependent aggregate 23041369 were cancelled before
+starting. Replaced by **23041383**, 18 independent variant/fold tasks, each one
+GPU + one CPU, 48 GiB RAM and 50 minutes, at most six concurrent. Maximum
+reservation 15 GPU-hours / 15 CPU core-hours. Shorter jobs are easier to backfill
+than three folds in one 2h50m allocation. Retained checkpoints and predictions
+are written atomically. Aggregate **23041384** depends on the new array and
+LGB recovery 23041361. Revised reservations including spent CPU time total
+approximately 29.1 CPU core-hours, leaving retry margin below 32.
+
+Private local collection completed. All three tactical and 14 external inputs
+were independently rechecked against their manifests after transfer to the Mac.
+The two reproduction CSVs and environment lock are now backed up locally.
+
+## Reconstruction completed; fixed stress protocol
+
+All 18 CNN fold jobs in 23041383 completed successfully (approximately 2 to 9.5
+minutes each). Missing LightGBM folds 23041439 completed. The recovery runner
+explicitly matches LightGBM thread count to allocated CPUs, avoiding eight
+threads on a four-CPU allocation. Earlier recovery tasks were cancelled after
+about four minutes to correct this mismatch; their usage is included. First-fold
+LightGBM retention job 23041457 also completed, so all three tree models and
+all 18 CNN fold models are now retained. Final aggregate 23041458 completed.
+
+Reconstructed frozen ensemble mean spellF1 is **0.6382927** (original reported
+0.637). Paired official smooth50 on identical saved noise is **0.1924802**,
+not the 0.182 reported in SOLUTION.md. Original baseline benchmark driver was
+not committed, so the discrepancy cannot be resolved by replaying that driver.
+Our comparison uses the shipped starter.baseline.smooth implementation and
+asserts identical observation masks across model probability files.
+Match-bootstrap 95% interval for ensemble mean: [0.6060711, 0.6662003]; paired
+improvement: [0.4143942, 0.4739778]. These intervals do not correct model-selection
+optimism. No competition public labels were opened for this experiment.
+
+### Stress benchmark protocol, fixed before execution
+
+Reuse the three held-out tree models and 18 held-out CNN models; freeze decoder
+and ensemble weights. Seven matches x three new corruption seeds (101,202,303),
+with five cases: no added ball dropout, rotated target observation mask, 40% IID
+dropout, 40% Markov dropout with 2-second mean gaps, and 40% Markov dropout with
+10-second mean gaps. Keep player dropout and augmented dead-ball trajectories
+identical across the five cases within each match/seed. The no-dropout case
+still has player noise and augmented dead-ball carries; it is not raw DFL data.
+
+Use fold models that never trained on the evaluated match. New seeds are noise
+replications, not new independent matches. This is sensitivity analysis of the
+selected pipeline, not an independent test or another hyperparameter search.
+Match labels never enter the mask generators. Retain per-member and ensemble
+probabilities for future CPU-only analyses; record realised missingness, gaps,
+D precision/recall, spellF1, macroF1, Brier score and 15-bin calibration error.
+Check CPU versus GPU probabilities on a full sequence per task; fail if maximum
+absolute discrepancy exceeds 0.002. Disable cuDNN TF32 for this comparison.
+
+Planned GPU cap for stress: 21 tasks x 20 minutes = 7 GPU-hours (and 7 CPU
+core-hours), with an initial one-task smoke test before submitting the remaining
+20 tasks. Prior actual accounting and storage are checked before submission.

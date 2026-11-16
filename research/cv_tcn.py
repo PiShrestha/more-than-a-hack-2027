@@ -34,8 +34,11 @@ def main():
                     epochs=tcn.EPOCHS, width=tcn.WIDTH,
                     source=(ROOT/'research/SOURCE_COMMIT').read_text().strip(),
                     gpu=torch.cuda.get_device_name(), torch=torch.__version__)
-    (out/'settings.json').write_text(json.dumps(settings, indent=2)+'\n')
+    only_fold = os.environ.get('FOLD_ONLY')
+    (out/f'settings-{only_fold or "all"}.json').write_text(json.dumps(settings, indent=2)+'\n')
     for fi, fold in enumerate(((0,1),(2,3),(4,5,6))):
+        if only_fold is not None and fi != int(only_fold):
+            continue
         started = time.time()
         val = [idsse.MATCHES[i] for i in fold]
         train = [m for m in idsse.MATCHES if m not in val]
@@ -50,15 +53,25 @@ def main():
             stats = (ck['mu'], ck['sd'])
         else:
             net, stats = tcn.fit(tcn._realisations(train, mask, tcn.N_REAL, tcn.TSEED), 'cuda')
+            tmp = ck_path.with_suffix('.tmp')
             torch.save(dict(state=net.state_dict(), mu=stats[0], sd=stats[1],
-                            train=train, validation=val, settings=settings), ck_path)
+                            train=train, validation=val, settings=settings), tmp)
+            tmp.replace(ck_path)
         # Same seed, ordering and corruption as possession.model.cv.
         rng = np.random.default_rng(SEED+1)
         for match in val:
             d = add_noise(idsse.load(match), mask, rng)
-            p = proba(net, stats, d)
             path = Path(idsse.SRC)/f'cvtcn{tcn.TAG}_{match}.npz'
-            np.savez(path, p=p, y=d['y'], period=d['period'], bvis=~np.isnan(d['bx']))
+            if path.exists():
+                old = np.load(path)
+                assert np.array_equal(old['y'],d['y']) and np.array_equal(old['bvis'],~np.isnan(d['bx']))
+                print('reusing',path,flush=True)
+                continue
+            p = proba(net, stats, d)
+            tmp = path.with_suffix('.tmp')
+            with tmp.open('wb') as f:
+                np.savez(f, p=p, y=d['y'], period=d['period'], bvis=~np.isnan(d['bx']))
+            tmp.replace(path)
             print('saved', path, flush=True)
         print('fold completed', fi, 'seconds', time.time()-started, flush=True)
 

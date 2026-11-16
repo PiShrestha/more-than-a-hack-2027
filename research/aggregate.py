@@ -43,7 +43,9 @@ def main():
             metrics = {}
             for name, labels in [('ensemble',pred),('smooth50',bp)]:
                 r = model.pm.evaluate(gt.astype(np.int8),labels.astype(np.int8))
-                metrics[name] = {k:r[k] for k in ('spell_f1_mean','macro_f1','f1_D','precision_D','recall_D','n_pred_spells','n_gt_spells')}
+                metrics[name] = {k:r[k] for k in ('spell_f1_mean','macro_f1','n_pred_spells','n_gt_spells')}
+                for key in ('f1','precision','recall'):
+                    metrics[name][key+'_D'] = r['per_class']['D'][key]
                 # Original scorer inputs may join adjacent halves; explicitly audit half separation.
                 parts_gt,parts_pr = [],[]
                 for half in np.unique(a['period'][a['period']>0]):

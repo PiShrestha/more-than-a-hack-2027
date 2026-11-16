@@ -4,5 +4,13 @@
   "cv_lgb": "23038818",
   "gpu_smoke": "23038819",
   "cv_tcn_array": "23038820",
-  "aggregate": "23038821"
+  "aggregate": "23038821",
+  "cv_lgb_resume": "23041361",
+  "cv_tcn_resume": "23041362",
+  "cv_tcn_folds": "23041383",
+  "aggregate_final": "23041384",
+  "aggregate_cancelled": "23041369",
+  "cv_lgb_final": "23041439",
+  "cv_lgb_retain": "23041457",
+  "aggregate_complete": "23041458"
 }
