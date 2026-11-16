@@ -94,3 +94,10 @@ lock and any reproduction-hash report before claiming success. Do not blindly
 resubmit jobs or overwrite partial results. Include failed jobs and any retry
 reservations in the budget. Remaining queued wall-time limits bound resource use
 without this chat connection.
+
+A local read-only collection helper, `research/collect.py`, is prepared. It
+records sacct/squeue state and backs up cluster logs, results and all staged
+input/cached data into gitignored research/artifacts/. Source inspection confirms
+the 14 required external XML files total 2,622,686,298 bytes; availability of all
+14 on the cluster remains unconfirmed until monitoring is restored. The local
+frozen submission hash and all original model/source files remain unchanged.
