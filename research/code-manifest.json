@@ -44,7 +44,7 @@
   "research/summarize-stress.sbatch": "4433774ba17fc9373ce736451eefb85c41f0efc14919efc1593bb9c1c172e245",
   "research/summarize_stress.py": "9a8476d36df0e79d902ffbf9bbdec3a572978d0f34e7c1a810278d3d928dcbe8",
   "research/test_corruptions.py": "6a31fa0c24a840ecde12e99dcfa0725315ec46e46aa7d7cd6e1b464fa730922b",
-  "research/verify_backup.py": "5b47ca09d23b47e0d686f0cd4dad2ab883a168227e434c1f0c8c330cdfbb7812",
+  "research/verify_backup.py": "68df1dc352c83f7c7520d5e213108496f56331c5044d3d4c303905de2e654550",
   "run.sh": "4b831716f29a8339264097f878fe3de2d862bc1f6a6295a4c540cb2b13fa90f3",
   "starter/baseline.py": "84d8a414fb1bdf8c7e1fbe4a8789fe6f9cc0c2cccec4685201285b75dbc0cfe6",
   "starter/load_atd.py": "6c63ee807ae5c1456d0f4dec933f61ad05227c1c663e7e80c96ead1255eeed30",

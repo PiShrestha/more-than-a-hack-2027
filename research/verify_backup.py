@@ -20,6 +20,14 @@ def digest(path):
 def main():
     root=ROOT/'research/artifacts'
     results=root/'results'
+    assert json.loads((results/'artifact-audit.json').read_text())['status']=='passed'
+    assert json.loads((results/'stress-summary.json').read_text())['evaluations']==105
+    assert json.loads((results/'period-audit.json').read_text())['evaluations']==105
+    inputs=json.loads((root/'data/verified-inputs.json').read_text())
+    assert len(inputs)==17
+    for item in inputs:
+        path=root/'data'/item['path']
+        assert path.stat().st_size==item['size'] and digest(path)==item['sha256']
     cohort=json.loads((results/'dataset-summary.json').read_text())
     params=json.loads((ROOT/'possession/decoder.json').read_text())
     members=['lightgbm','ensemble']+['tcn'+(tag or '_base') for tag in params['tcn_tags']]
