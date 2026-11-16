@@ -3137,5 +3137,14 @@
     },
     "seconds": 308.14774775505066,
     "note": "Candidate isolates CNN halves with unchanged weights, play features, tree and decoder. No BAR-ATH labels or accuracy evaluation; original submission files unchanged."
+  },
+  "final-tree/candidate-reproduction.json": {
+    "status": "passed",
+    "repeats": 2,
+    "candidate_status": "research_only_not_submitted",
+    "saved_tree_sha256": "51ce8b796907ff4b5f703bac7aa2e7c95f0edc306da345c3a50e03ed09744b85",
+    "frozen_csv_sha256": "557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c",
+    "candidate_csv_sha256": "8c3449d054bbd5b16a1935175faa8308c04baaf4d864fee1d443b33782ac19fa",
+    "note": "Second run reuses the saved tree; both runs execute all six stock CNNs."
   }
 }

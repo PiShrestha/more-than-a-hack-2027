@@ -1,8 +1,11 @@
 {
-  "cluster_scratch_kib": 10913580,
-  "cluster_code_kib": 375965,
-  "local_project_kib": 5162748,
-  "total_measured_gib": 15.690129280090332,
+  "measured_utc": "2026-11-16T21:24:22.598592+00:00",
+  "directories": {
+    "cluster_scratch_kib": 11453072,
+    "cluster_code_kib": 376284,
+    "local_research_checkout_kib": 5706316
+  },
+  "total_gib": 16.72332000732422,
   "cap_gib": 20,
-  "note": "Includes raw inputs, caches, environment, source and private backups on cluster and Mac; small shared uv package-cache downloads are additional and keep total below 20 GiB."
+  "note": "Conservative gross allocated storage across scratch, cluster checkout and local research checkout including private backups and venv; counts original checkout files as well as new files."
 }

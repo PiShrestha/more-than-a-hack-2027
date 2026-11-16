@@ -690,14 +690,14 @@
     },
     {
       "job": "23048161",
-      "state": "PENDING",
-      "seconds": 0,
-      "cpus": 0,
+      "state": "COMPLETED",
+      "seconds": 139,
+      "cpus": 8,
       "gpus": 0,
       "exit_code": "0:0"
     }
   ],
-  "cpu_core_hours": 20.498055555555556,
+  "cpu_core_hours": 20.806944444444444,
   "gpu_hours": 3.4625,
   "caps": {
     "cpu_core_hours": 32,

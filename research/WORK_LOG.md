@@ -462,3 +462,30 @@ solution-review.patch; it is not applied to the frozen source or substituted
 for the team-reviewed document. The team still needs to review its wording and
 designate a single form submitter before November 17, 2026 at 23:59 CET /
 17:59 America/New_York. No form was sent and no branch was pushed.
+
+### Final verification checkpoint
+
+Repeat-inference job 23048161 completed successfully in 2m19s. Original and
+research candidate CSVs were byte-identical between runs. Retained tree SHA-256:
+51ce8b796907ff4b5f703bac7aa2e7c95f0edc306da345c3a50e03ed09744b85.
+The half-isolated research candidate remains private and unsubmitted, hash
+8c3449d054bbd5b16a1935175faa8308c04baaf4d864fee1d443b33782ac19fa.
+
+After final rsync collection, verify_backup.py passed all 17 source-data
+checksums, 105 stress archives / 840 member matrices, 56 additional context
+archives, 18 stock and three per-frame fold checkpoints, three fold trees,
+and the retained final tree / repeated candidate CSV hashes. The original CPU
+replay scores matched exactly. All 75 source/model manifest hashes matched;
+eight focused tests passed. The proposed solution patch passes apply --check.
+Both the main user checkout and the frozen submission paths are unchanged.
+
+Final allocated use including failed/cancelled jobs: 20.80694 CPU core-hours
+and 3.4625 GPU-hours. Conservative gross storage across cluster scratch,
+cluster checkout and this full local research checkout: 16.72332 GiB (original
+checkout files included). All are within the 32 / 24 / 20 caps. No experiment
+jobs remain unfinished. Further analysis of retained probabilities needs only
+the lightweight CPU environment; all required tracking data and trained models
+are privately backed up. Detailed machine-readable records are
+resource-accounting.json, storage-accounting.json, followup-results.json and
+backup-inventory.json. The remaining submission steps are team document review
+and one designated form response; no push or form submission has occurred.
