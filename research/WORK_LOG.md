@@ -75,3 +75,22 @@ submitting the training array. No new model is substituted into the submission.
 All downstream jobs depend on successful input preparation. GPU training additionally
 depends on a CUDA smoke test. The array allows two concurrent GPU tasks, six
 GPU-hours maximum in aggregate. Invalid dependencies cancel rather than linger.
+
+## Monitoring interruption (2026-11-16, approximately 12:12 America/New_York)
+
+SSH previously succeeded and setup job 23038805 was observed RUNNING with pinned
+packages installed and the first three external matches checksum-verified.
+Later monitoring timed out connecting to port 22, before authentication. DNS
+still resolves login.hpc.virginia.edu. macOS network inspection showed only en0,
+no configured scutil VPN service, and the UVA address routed through the default
+Wi-Fi gateway. No VPN/network settings were changed. A request to restore the
+UVA route was sent to the user. This is a new connectivity interruption, not the
+earlier sandbox DNS problem. Queued jobs and dependencies remain on Slurm;
+completion, GPU readiness and the full external-data manifest are not yet verified.
+
+Next monitoring must inspect sacct for ALL recorded job IDs, including failed
+or cancelled dependent jobs; retrieve setup logs, data manifests, environment
+lock and any reproduction-hash report before claiming success. Do not blindly
+resubmit jobs or overwrite partial results. Include failed jobs and any retry
+reservations in the budget. Remaining queued wall-time limits bound resource use
+without this chat connection.
