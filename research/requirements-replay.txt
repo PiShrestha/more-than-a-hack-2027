@@ -1,0 +1,5 @@
+# CPU replay tested with Python 3.14 on Linux; no Torch or LightGBM needed.
+numpy==2.5.4
+pandas==3.1.1
+numba==0.68.1
+llvmlite==0.50.0

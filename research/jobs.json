@@ -12,5 +12,13 @@
   "aggregate_cancelled": "23041369",
   "cv_lgb_final": "23041439",
   "cv_lgb_retain": "23041457",
-  "aggregate_complete": "23041458"
+  "aggregate_complete": "23041458",
+  "stress_smoke": "23042202",
+  "stress_array_cancelled": "23042302",
+  "stress_resume": "23042339",
+  "stress_array": "23042378",
+  "stress_summary": "23042379",
+  "stress_array_1cpu_cancelled": "23042340",
+  "stress_summary_cancelled": "23042341",
+  "cpu_replay": "23042401"
 }

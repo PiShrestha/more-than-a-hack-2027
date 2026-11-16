@@ -187,3 +187,27 @@ absolute discrepancy exceeds 0.002. Disable cuDNN TF32 for this comparison.
 Planned GPU cap for stress: 21 tasks x 20 minutes = 7 GPU-hours (and 7 CPU
 core-hours), with an initial one-task smoke test before submitting the remaining
 20 tasks. Prior actual accounting and storage are checked before submission.
+
+Stress smoke 23042202 started on RTX A6000. The first full-match CPU/GPU
+comparison passed and the visible-ball case completed in 232 seconds. Future
+stress tasks request 30 minutes rather than 20 (21 x 30 min = 10.5 GPU/core
+hours maximum; total remains below both caps). Slurm denied extending the
+already-running smoke job; its existing 20-minute limit remains. Per-case
+probabilities are atomic; recovery now reuses completed cases and rescoring
+records, rather than repeating inference. The protocol, models, masks and
+selection rules are unchanged. Ensemble probabilities retain float64 and decoded
+labels in new caches; the initial smoke uses float32 probability caches.
+
+Pilot timing: first two cases each required approximately 226-232 seconds,
+mostly CPU tree inference. To reduce GPU idle time, replaced the still-pending
+20-task one-CPU array with four-CPU, 12-minute tasks. Worst-case reservation
+20 x 4 x 12 min = 16 CPU core-hours and 4 GPU-hours. Together with prior actual
+12.50 core-hours, the pilot/resume limits and final summary, reservation remains
+under 32 core-hours and 24 GPU-hours. No experimental choices changed.
+
+The first two stress cases passed the full CPU/GPU comparison, all model calls
+and scoring. Released remaining array 23042378 from the completed CUDA gate
+23038819 to overlap it with the pilot's remaining cases. Each task performs
+its own CPU/GPU check. Summary 23042379 still waits for all 21 complete reports,
+including the resumable pilot 23042339. CPU-only cache replay 23042401 follows
+the summary and explicitly asserts that Torch was not imported.

@@ -46,6 +46,14 @@ def main():
     work=Path(os.environ['RESEARCH_RESULTS'])
     out=work/'stress'/f'{match}-seed{seed}'
     out.mkdir(parents=True,exist_ok=True)
+    existing=out/'report.json'
+    if existing.exists():
+        done=json.loads(existing.read_text())
+        assert (done['match'],done['seed'])==(match,seed)
+        assert [r['case'] for r in done['rows']]==list(CASES)
+        if all((out/f'{case}.npz').exists() for case in CASES):
+            print('reusing complete stress task',match,seed,flush=True)
+            return
     torch.set_num_threads(int(os.environ['SLURM_CPUS_PER_TASK']))
     assert torch.cuda.is_available()
     torch.backends.cudnn.allow_tf32=False
@@ -72,6 +80,29 @@ def main():
         started=time.time()
         dropped=mask(case,len(gt),template,seed+task%7)
         d=dict(base,bx=np.where(dropped,np.nan,base['bx']),by=np.where(dropped,np.nan,base['by']))
+        dest=out/f'{case}.npz'
+        if dest.exists():
+            old=np.load(dest)
+            assert np.array_equal(old['y'],gt) and np.array_equal(old['bvis'],~dropped)
+            if cpu_gpu_check is None:
+                _,net,stats=nets[0]
+                net.cpu()
+                cp=.5*(neural(net,stats,tcn.features(d)[0],'cpu')+
+                       neural(net,stats,tcn.features(d,flip=True)[0],'cpu')[:,[1,0,2]])
+                net.cuda()
+                p=old['tcn_base']
+                cpu_gpu_check=dict(max_probability_error=float(np.max(abs(cp-p))),
+                                   argmax_agreement=float((cp.argmax(1)==p.argmax(1)).mean()))
+                assert cpu_gpu_check['max_probability_error']<.002,cpu_gpu_check
+            ens=old['ensemble']
+            pred=old['decoded'] if 'decoded' in old else model.decode(ens,d['period'],params)
+            record=dict(case=case,match=match,seed=seed,fold=fi,corruption=gap_summary(dropped),
+                        ensemble=metrics(gt,pred,ens),smooth50=metrics(gt,baseline(d)),
+                        seconds=time.time()-started,resumed_from_cache=True)
+            rows.append(record)
+            (out/f'{case}.json').write_text(json.dumps(record,indent=2)+'\n')
+            print(json.dumps(record),flush=True)
+            continue
         X,_=tcn.features(d)
         Xf,_=tcn.features(d,flip=True)
         lp=.5*(booster.predict(X,num_threads=int(os.environ['SLURM_CPUS_PER_TASK']))+
@@ -93,8 +124,7 @@ def main():
         ens=(1-params['tcn_weight'])*lp+params['tcn_weight']*np.mean(ps,axis=0)
         pred=model.decode(ens,d['period'],params)
         bp=baseline(d)
-        saved.update(ensemble=ens.astype(np.float32),y=gt.astype(np.int8),period=d['period'],bvis=~dropped)
-        dest=out/f'{case}.npz'
+        saved.update(ensemble=ens,decoded=pred.astype(np.int8),y=gt.astype(np.int8),period=d['period'],bvis=~dropped)
         tmp=dest.with_suffix('.tmp')
         with tmp.open('wb') as f:
             np.savez_compressed(f,**saved)
@@ -102,6 +132,7 @@ def main():
         record=dict(case=case,match=match,seed=seed,fold=fi,corruption=gap_summary(dropped),
                     ensemble=metrics(gt,pred,ens),smooth50=metrics(gt,bp),seconds=time.time()-started)
         rows.append(record)
+        (out/f'{case}.json').write_text(json.dumps(record,indent=2)+'\n')
         print(json.dumps(record),flush=True)
     report=dict(source=(ROOT/'research/SOURCE_COMMIT').read_text().strip(),match=match,seed=seed,
                 decoder=params,cpu_gpu_check=cpu_gpu_check,gpu=torch.cuda.get_device_name(),rows=rows,

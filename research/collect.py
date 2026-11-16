@@ -17,7 +17,7 @@ def main():
     r = subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10',HOST,command],
                        capture_output=True,text=True,timeout=45,check=True)
     (DEST/'cluster-status.txt').write_text(r.stdout)
-    print(r.stdout)
+    print('Saved full Slurm status to',DEST/'cluster-status.txt',flush=True)
     for remote,local in [(REMOTE_CODE+'/logs/','logs/'),
                          (REMOTE_WORK+'/results/','results/'),
                          (REMOTE_WORK+'/data/','data/')]:
