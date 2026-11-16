@@ -1,5 +1,6 @@
 """Record allocated CPU/GPU hours across successful, failed and cancelled jobs."""
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -8,7 +9,10 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     ids=sorted(set(json.loads((ROOT/'research/jobs.json').read_text()).values()))
-    r=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','login.hpc.virginia.edu',
+    ssh=['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10']
+    if os.environ.get('UVA_SSH_FRONTEND'):
+        ssh+=['-o','HostName='+os.environ['UVA_SSH_FRONTEND'],'-o','HostKeyAlias=login.hpc.virginia.edu']
+    r=subprocess.run(ssh+['login.hpc.virginia.edu',
         'sacct -n -j '+','.join(ids)+' --format=JobID,State,ElapsedRaw,AllocCPUS,AllocTRES,ExitCode -P'],
         capture_output=True,text=True,check=True,timeout=45)
     rows=[]

@@ -252,3 +252,11 @@ analysis without further GPU training.
 Two monitoring attempts later received SSH key-exchange connection resets
 from login.hpc.virginia.edu. Jobs are unaffected; retry monitoring after a
 brief backoff rather than resubmitting work or changing credentials.
+
+Monitoring recovered through **128.143.223.181**, another address returned by
+DNS for login.hpc.virginia.edu. The .182 frontend reset key exchange and .180
+timed out; .181 authenticated with the existing user/config and normal host-key
+verification via HostKeyAlias=login.hpc.virginia.edu. No credentials, SSH config
+or host-key verification rules were changed. Collection/accounting helpers now
+accept an optional UVA_SSH_FRONTEND for this legitimate frontend selection.
+Fifteen complete stress reports were confirmed after recovery.

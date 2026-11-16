@@ -1,6 +1,8 @@
 """Read cluster state and back up private artifacts locally; does not submit jobs."""
 import json
+import os
 from pathlib import Path
+import shlex
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,7 +16,10 @@ def main():
     ids = ','.join(json.loads((ROOT/'research/jobs.json').read_text()).values())
     command = ('sacct -j '+ids+' --format=JobID,JobName,State,ElapsedRaw,AllocCPUS,MaxRSS,AllocTRES,ExitCode -P; '
                'squeue -u "$USER" -o "%.20i %.22j %.8T %.10M %R"')
-    r = subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10',HOST,command],
+    ssh=['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10']
+    if os.environ.get('UVA_SSH_FRONTEND'):
+        ssh+=['-o','HostName='+os.environ['UVA_SSH_FRONTEND'],'-o','HostKeyAlias='+HOST]
+    r = subprocess.run(ssh+[HOST,command],
                        capture_output=True,text=True,timeout=45,check=True)
     (DEST/'cluster-status.txt').write_text(r.stdout)
     print('Saved full Slurm status to',DEST/'cluster-status.txt',flush=True)
@@ -23,7 +28,7 @@ def main():
                          (REMOTE_WORK+'/data/','data/')]:
         p = DEST/local
         p.mkdir(parents=True,exist_ok=True)
-        subprocess.run(['rsync','-az','--partial','--exclude=*.part',
+        subprocess.run(['rsync','-az','--partial','--exclude=*.part','--exclude=*.tmp','-e',shlex.join(ssh),
                         HOST+':'+remote,str(p)+'/'],check=True,timeout=1800)
     print('Private data and experiment backups:',DEST)
 
