@@ -8,6 +8,32 @@ engineers. You are given one complete LaLiga match — two camera feeds, automat
 player and the ball, automatic tactical tagging, and the camera-to-pitch geometry — and one
 question to answer with it.
 
+## Possession pipeline and computational research
+
+This fork adds a deterministic possession sequence model and a reproducible
+tracking-robustness research pilot. Start with these project documents:
+
+| Document | Contents |
+|---|---|
+| [Solution and reproduction](solution/README.md) | Inference method, exact regeneration, pinned evaluation environment, public pipeline-check scores and limitations |
+| [Research protocol](research/README.md) | Frozen missingness experiments, external-match label audit and planned model comparisons |
+| [Validation and experiment record](research/LOCAL_VALIDATION.md) | Tests, output hash, natural missingness statistics, full-match smoke results and current access blockers |
+
+Current validation: 20 unit tests pass, and the official validator accepts the
+199,319-row output. Regeneration preserves CSV SHA-256
+`9d00cb8db58bd259c655e3af50d21090f32435a67c1fc354385718d3df951944`.
+Full-match accuracy is unknown; the public five minutes are a pipeline check
+only and are never used for training, hyperparameter tuning or model selection.
+The current method has not demonstrated improvement over the strongest public
+baseline, and dead-ball inference remains a major limitation.
+
+The robustness pilot uses 19 fixed-model decodes: a clean run plus 18 seeded
+missingness corruptions. The completed smoke experiment measures prediction
+stability, not accuracy.
+
+Licensed match assets, transient corrupted tracking and private experiment
+records remain excluded from git. The committed results are aggregate summaries.
+
 ---
 
 ## The task

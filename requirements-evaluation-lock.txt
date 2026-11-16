@@ -1,0 +1,8 @@
+# Reproduction environment for official CSV validation/scoring, Python >=3.11.
+# The solution inference module itself uses only the standard library.
+numpy==2.3.5
+pandas==2.3.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+six==1.17.0
