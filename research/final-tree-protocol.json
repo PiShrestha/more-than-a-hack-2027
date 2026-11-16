@@ -1,0 +1,17 @@
+{
+  "source": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "training": "Original deterministic full-seven-match LightGBM recipe, 8 threads",
+  "verification": "Reload saved tree and require exact original frozen CSV SHA-256 before generating any candidate",
+  "candidate": "Same committed six CNN weights, tree probabilities, features and decoder; CNN sequence inference runs independently inside each published half",
+  "guardrails": [
+    "Never overwrite submission/submission.csv",
+    "No BAR-ATH ground truth read or evaluated",
+    "Candidate stays private and is not submitted",
+    "Package tool continues to require original frozen CSV hash"
+  ],
+  "budget": {
+    "cpu_core_hours_max": 2,
+    "gpu_hours": 0,
+    "new_storage_gib_estimate": 0.2
+  }
+}
