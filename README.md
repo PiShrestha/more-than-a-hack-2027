@@ -1,5 +1,7 @@
 # encara_messi: football possession from automatic tracking
 
+[![Submission integrity](https://github.com/PiShrestha/more-than-a-hack-2027/actions/workflows/submission.yml/badge.svg?branch=submission)](https://github.com/PiShrestha/more-than-a-hack-2027/actions/workflows/submission.yml)
+
 Our Phase 1 entry for More than a Hack 2027 labels all 199,319 frames of the
 Barcelona vs Athletic Club tactical video as home possession, away possession,
 dead ball, or outside the published halves.

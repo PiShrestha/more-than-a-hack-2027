@@ -15,10 +15,16 @@ The expected CSV contains 199,319 rows and has SHA-256:
 
 Verification and packaging use only Python's standard library, Python 3.10 or
 later. Model reproduction uses Python 3.14 and the exact versions in
-`requirements-solution.txt`. The complete reconstruction was checked on Linux
+`requirements-solution.txt`. [The recorded Linux environment](submission/environment-linux.txt)
+also lists transitive packages from the research machine, including CUDA packages
+that are not needed for CPU inference. It is an environment record, not a portable
+installation command. The complete reconstruction was checked on Linux
 with eight CPU cores and a 32 GiB memory allocation. No GPU is needed for
 submission inference. Allow several GiB of working space for converted data
-and fresh caches. Runtime depends on hardware and download speed.
+and fresh caches. Runtime depends on hardware and download speed. Reserve at least 30 minutes for
+a fresh-cache run on a shared cluster. A 15-minute release check timed out after
+converting the external data; the previously completed exact reproduction checks
+remain recorded on the research branch.
 
 ## Verify the committed files
 
