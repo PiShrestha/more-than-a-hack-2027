@@ -1,11 +1,14 @@
 {
-  "measured_utc": "2026-11-16T21:24:22.598592+00:00",
+  "measured_utc": "2026-11-17T20:13:20.641787+00:00",
   "directories": {
-    "cluster_scratch_kib": 11453072,
-    "cluster_code_kib": 376284,
-    "local_research_checkout_kib": 5706316
+    "cluster_scratch_kib": 11897104,
+    "cluster_research_checkout_kib": 376324,
+    "cluster_release_checkout_kib": 20514,
+    "local_research_checkout_kib": 5692320,
+    "local_release_worktree_kib": 22276,
+    "local_main_workspace_kib": 34420
   },
-  "total_gib": 16.72332000732422,
+  "total_gib": 17.20710563659668,
   "cap_gib": 20,
-  "note": "Conservative gross allocated storage across scratch, cluster checkout and local research checkout including private backups and venv; counts original checkout files as well as new files."
+  "note": "Conservative gross allocated storage, including private backups, both release checkouts, and a failed-run temporary cache. Original checkout files are included."
 }

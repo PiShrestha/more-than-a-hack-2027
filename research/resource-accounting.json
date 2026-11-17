@@ -695,9 +695,25 @@
       "cpus": 8,
       "gpus": 0,
       "exit_code": "0:0"
+    },
+    {
+      "job": "23076854",
+      "state": "TIMEOUT",
+      "seconds": 909,
+      "cpus": 8,
+      "gpus": 0,
+      "exit_code": "0:0"
+    },
+    {
+      "job": "23077630",
+      "state": "COMPLETED",
+      "seconds": 466,
+      "cpus": 8,
+      "gpus": 0,
+      "exit_code": "0:0"
     }
   ],
-  "cpu_core_hours": 20.806944444444444,
+  "cpu_core_hours": 23.8625,
   "gpu_hours": 3.4625,
   "caps": {
     "cpu_core_hours": 32,

@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-17T19:48:31.978730+00:00",
+  "frozen_model_commit": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "fresh_cache_reproduction": {
+    "jobs": [
+      {
+        "job": "23076854",
+        "state": "TIMEOUT",
+        "seconds": 909,
+        "allocated_cpus": 8,
+        "exit_code": "0:0"
+      },
+      {
+        "job": "23077630",
+        "state": "COMPLETED",
+        "seconds": 466,
+        "allocated_cpus": 8,
+        "exit_code": "0:0"
+      }
+    ],
+    "python": "3.14.9",
+    "wrapper_sha256": "00795b4e90eaa7c5c9afce74380ea334354401f00c2432e75bbf0ebbb48bcaf6",
+    "csv_sha256": "557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c",
+    "document_sha256": "4139e1dc85a0bc5cc249b27702da4c9aa3db57dde4e650d3f845760de8fb3550"
+  },
+  "ci": {
+    "run_url": "https://github.com/PiShrestha/more-than-a-hack-2027/actions/runs/44146098210",
+    "tested_commit": "6c45bc7aacc23bbf97d040787c3ebb7c6dbcad39",
+    "status": "passed",
+    "release_tests": 8
+  },
+  "note": "Same original recipe, fresh caches, verified raw inputs, CPU inference. The initial 15-minute attempt timed out; the retry passed. No BAR-ATH ground truth was evaluated. No form receipt is implied."
+}

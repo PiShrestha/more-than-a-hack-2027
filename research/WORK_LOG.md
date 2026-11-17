@@ -519,3 +519,36 @@ assets, research probabilities, or research candidate are included.
 This continuation consumed no additional cluster compute. Remaining external
 actions: team document review and one designated form submission. No response
 has been sent, and no branch has been pushed.
+
+### Submission release cleanup, November 17
+
+Created a clean submission branch from the frozen model source. The branch
+contains the final 1,015-word Downloads document, the unchanged CSV, source and
+input hash manifests, a standard-library verification/packaging command, an
+isolated reproduction wrapper, eight release tests, and pinned GitHub Actions.
+The organizer README and root SOLUTION.md remain available as historical
+material. Research files remain on this branch. Submission is the GitHub
+default branch and the main local workspace now tracks it. No source, weights,
+decoder, or original CSV on possession-model changed.
+
+The release CI passed at 6c45bc7. Both release package files matched Downloads
+exactly, and the official validator passed. The initial end-to-end guarded
+wrapper job 23076854 timed out at 15m09s after converting all external matches.
+The job used eight CPUs, so it remains included in allocated accounting. A
+single retry, 23077630, has a 30-minute limit (maximum four additional core-
+hours). The retry is not recorded as passed until its exact CSV check succeeds.
+No new model variants or BAR-ATH label evaluations are part of these checks.
+
+The guarded fresh-cache retry 23077630 completed in 7m46s. It regenerated the
+exact frozen CSV hash and the final Downloads document hash. The wrapper source
+hash matched the code published on submission. Both the timeout and successful
+retry are recorded publicly in submission/verification.json; a copy is retained
+as research/release-verification.json. The final release is tagged
+submission-2026-11-17. Model source, six checkpoints, decoder, and original CSV
+remain byte-identical to 602b613. New CI verifies source/artifact hashes and safe
+packaging without model training.
+
+All required raw inputs were verified again using the release input manifest.
+The release package matches Downloads exactly, and the official validator passed.
+Latest allocated use including the timeout: 23.8625 CPU core-hours and 3.4625 GPU-
+hours, within the 32/24 caps. No more model jobs are required for this cleanup.

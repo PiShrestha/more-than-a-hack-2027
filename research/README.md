@@ -1,95 +1,78 @@
-# Compute-first continuation
+# Possession research and verification
 
-Research checkpoint: November 16, 2026. All required tracking/metadata inputs, models,
-105 stress evaluations and audits are verified and backed up privately. The
-frozen submission reproduced twice exactly. CPU replay of all 105 cached cases
-took 14.6 seconds on the Mac, with no Torch or LightGBM installed. See the final
-entry in WORK_LOG.md for results, resource totals and remaining submission tasks.
+This branch contains completed Rivanna experiments and audits. The prepared
+competition release, final document, and guarded reproduction tools are on the
+[`submission` branch](https://github.com/PiShrestha/more-than-a-hack-2027/tree/submission),
+which is now the repository's default branch. Use that branch for upload files.
 
-See [WORK_LOG.md](WORK_LOG.md) for the frozen source, data provenance, budget,
-job IDs, results and failures. This directory is added on a separate research
-branch. Nothing here changes the submitted possession-model pipeline.
+The model and original prediction remain frozen at
+`602b6139b8fe82d0256515102444534bf94b32d7` on `possession-model`. No research
+variant replaces the fixed submission. No form receipt or private score has
+been recorded here.
 
-The expensive deliverables are the environment/data caches, two Linux
-reproduction checks, 18 match-held-out CNN fold models and 49 per-match
-probability files (7 LightGBM, 42 CNN). Once those exist, ensemble/decoder
-analysis and match-bootstrap summaries run on CPU without training again.
+## What was verified
 
-`aggregate.py` evaluates only the other-match data with the frozen submitted
-ensemble configuration. It does not tune or select any settings. Its confidence
-intervals quantify variation across seven matches conditional on this chosen
-pipeline, not uncertainty from the prior model-selection process. No target
-public ground truth is opened by these research scripts.
+Repeated Linux runs regenerated the frozen CSV exactly, including a fresh-clone
+check. Its SHA-256 is in [reproduction-hashes.txt](reproduction-hashes.txt).
+All 17 staged raw inputs were checked by size and hash; 16 are needed by the
+final tracking-only pipeline. Smart Tagging is staged but unused.
 
-Inputs required for this stage:
+The fixed external validation reconstruction gave mean spellF1 0.6383 versus
+0.1925 for the shipped smooth50 baseline under the same noise. These seven
+matches were already used for model selection. The confidence intervals are
+conditional on that choice, not estimates from an untouched test set.
 
-- tactical ATD TXT and metadata XML (licensed, already staged);
-- all 14 IDSSE position/metadata XMLs (open, checksummed by prepare_data.py);
-- six submitted network checkpoints and the submitted decoder (in source).
+## Completed experiments
 
-Smart Tagging is staged but unused. Video, broadcast and homography are not
-inputs to this tracking-only experiment. The public BAR-ATH labels are not
-needed for the queued jobs.
+- Five observation patterns across seven matches and three corruption seeds:
+  105 cases, with 840 saved member probability matrices.
+- Twenty-six predefined ensemble and decoder settings across those cases:
+  2,730 CPU evaluations. No replacement was selected.
+- Four sequence-context conditions across seven matches: 28 retained cases.
+  Distant context changed predictions through whole-sequence GroupNorm.
+- A same-capacity per-frame normalization ablation: three trained folds and
+  28 retained cases. It removed distant-context dependence, but one seed did
+  not establish a general accuracy gain.
+- Period-boundary, short-possession failure, saved-model, CPU replay, and
+  private-backup integrity audits.
 
-The cluster's Python 3.14 module and pinned requirements are used. The complete
-resolved Linux environment is recorded in results/environment-lock.txt. GPU
-smoke testing gates all CNN training. Per-fold retained checkpoints store the
-training and validation match IDs, settings and normalization statistics.
+See [followup-results.json](followup-results.json) for aggregate comparisons and
+[WORK_LOG.md](WORK_LOG.md) for decisions, failures, job IDs, and limitations.
+Corruption seeds repeat the same seven games; they are not independent matches.
+No new candidate was evaluated against BAR-ATH public labels.
 
-Do not execute the original optional `possession.model ens` command on the
-submission copy: it defaults to a single CNN and overwrites decoder.json.
-Research LightGBM CV sets POSS_TAG=_audit to preserve the submitted decoder.
-Any future grid search belongs in a separate output configuration, and its
-score must be described as validation/model-selection performance.
+## Retained artifacts and later CPU work
 
-After completion, back up scratch outputs before cleanup. Private backups live
-under research/artifacts/ locally and are gitignored. Keep source, aggregate
-records, logs and dependency locks separately from licensed raw inputs. Do not
-publish BAR-ATH-derived frame arrays or any licensed match assets.
+Private, gitignored `artifacts/` contains all raw tracking/metadata inputs,
+18 stock CNN fold checkpoints, three per-frame CNN fold checkpoints, three
+LightGBM fold models, the final full-data tree, and cached predictions. The
+half-isolated research candidate is separate and unsubmitted. Raw assets and
+frame-level arrays are not distributed by this branch.
 
-## Completed expensive artifacts and later CPU work
+`replay.py` can change decoder settings or ensemble weights from the caches
+without installing Torch or LightGBM. The tested dependencies are in
+[requirements-replay.txt](requirements-replay.txt). A complete replay of 105
+cases took about 15 seconds on the Mac. Choosing settings against these caches
+remains model selection.
 
-The latest submitted CSV reproduced byte-for-byte twice on Linux. The frozen
-hash is in reproduction-hashes.txt. All three LightGBM fold models and 18 CNN
-fold checkpoints are retained privately under artifacts/results/folds/.
-Original held-out predictions live under artifacts/data/external/idsse/.
+`verify_backup.py` checks input and output hashes, probability alignment,
+normalization, replay agreement, and the private named submission package.
+`collect.py` retrieves existing cluster outputs; it submits no jobs.
+`accounting.py` includes failed and cancelled work in allocated CPU/GPU hours.
+The full Linux environment is recorded in [requirements-linux-lock.txt](requirements-linux-lock.txt).
 
-The fixed stress benchmark adds five observation patterns x seven matches x
-three corruption seeds. It retains per-member probabilities, the frozen
-ensemble, labels/periods for the open matches, and scoring reports. These are
-private experiment artifacts, not files to add to the submission branch.
+The public records contain source pointers, hashes and aggregate evidence.
+Reproduction of the experiments needs the permitted inputs described by their
+protocol files. See [idsse-source.json](idsse-source.json) for the open source
+records and [verified-inputs.json](verified-inputs.json) for the staged hashes.
 
-After the jobs complete, `replay.py` can evaluate cached probabilities with
-alternative decoder penalties or ensemble weights on CPU. It needs neither
-Torch nor LightGBM nor raw tracking; requirements-replay.txt gives the tested
-CPU dependencies. Defaults replay the frozen ensemble and do not change it.
-The only initial float32-only ensemble caches are from the first pilot; later
-caches retain float64 ensemble probabilities and decoded labels as well.
+## Submission boundary
 
-Keep alternative settings in separate output files. Changing settings against
-these seven matches remains model selection, not independent test evaluation.
-No competition public labels are needed for these tasks.
+The CSV, final technical document and canonical upload command live on
+`submission`. `package_submission.py` here is an earlier local staging helper;
+it is not the release entry point. The root `SOLUTION.md` is a preserved team
+draft, not the final named technical document.
 
-## November 16 follow-up artifacts
-
-The CPU sensitivity study evaluated 26 predefined configurations on all 105
-stress cases. Controlled context probes retained 28 external-match prediction
-archives, and the matched-capacity per-frame normalization experiment retained
-three additional fold checkpoints and 28 prediction archives. These are research
-diagnostics on the same seven selected validation matches. No alternative model
-was selected for submission. See WORK_LOG.md for results and limitations.
-
-The final original LightGBM model is now saved under
-`artifacts/results/final-tree/model.txt`. It reproduces the original submission
-with the committed six CNNs and avoids retraining for later inference. A
-separately named half-isolated research candidate is retained in that directory;
-it is not the official submission and has not been evaluated against BAR-ATH
-labels. Its generating scripts are research code on this local branch.
-
-The registered team name supplied by the user is `encara_messi`. The exact frozen CSV and a revised technical-document draft are staged privately in
-`artifacts/submission-packages/encara_messi/`, for team review, with the original draft preserved separately. To rebuild the
-review bundle, use `package_submission.py --team-name encara_messi --document research/artifacts/submission-packages/encara_messi/encara_messi.md --bundle`.
-The helper preserves differing existing files instead of overwriting them. The submission deadline is November 17,
-2026, 23:59 CET / 17:59 America/New_York. One designated team member still needs
-to complete the Google Form after reviewing the document. Nothing has been
-pushed or submitted.
+Keep model experiments and outputs on this branch. In particular, the optional
+`possession.model ens` command can overwrite the decoder and defaults to one
+CNN. Do not run it in the fixed submission checkout.

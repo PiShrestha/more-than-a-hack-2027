@@ -34,5 +34,7 @@
   "frame_norm_eval": "23047269",
   "frame_norm_summary": "23047270",
   "retain_final_tree": "23047439",
-  "candidate_repeat": "23048161"
+  "candidate_repeat": "23048161",
+  "submission_release_proof": "23076854",
+  "submission_release_proof_retry": "23077630"
 }
