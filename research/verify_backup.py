@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -99,6 +100,20 @@ def main():
                           ('half-isolated-research-candidate.csv', 'candidate_csv_sha256')]:
         assert digest(final/filename) == reproduced[key]
     assert reproduced['frozen_csv_sha256'] == digest(ROOT/'submission/submission.csv')
+    package=root/'submission-packages/encara_messi'
+    manifest=json.loads((package/'package-manifest.json').read_text())
+    assert manifest['team_name']=='encara_messi'
+    for key in ('csv','technical_document','review_bundle'):
+        item=manifest[key]
+        assert Path(item['filename']).name==item['filename']
+        assert digest(package/item['filename'])==item['sha256']
+    assert manifest['csv']['sha256']==reproduced['frozen_csv_sha256']
+    with zipfile.ZipFile(package/manifest['review_bundle']['filename']) as archive:
+        assert archive.testzip() is None
+        assert archive.namelist()==[manifest[key]['filename'] for key in ('csv','technical_document')]
+        for key in ('csv','technical_document'):
+            name=manifest[key]['filename']
+            assert archive.read(name)==(package/name).read_bytes()
     inventory=[]
     for path in sorted(root.rglob('*')):
         if not path.is_file() or 'partial-backups' in path.parts:
@@ -112,6 +127,7 @@ def main():
         cnn_fold_checkpoints=18,tree_fold_models=3,
         additional_context_cache_files=context_files,frame_norm_fold_checkpoints=3,
         retained_final_tree=True,research_candidate_reproduced=True,
+        named_submission_package_verified=True,
         research_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         verifier_sha256=digest(Path(__file__)),files=inventory)
     (ROOT/'research/backup-inventory.json').write_text(json.dumps(result,indent=2)+'\n')

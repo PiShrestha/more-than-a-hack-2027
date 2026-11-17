@@ -1,9 +1,28 @@
 --- a/SOLUTION.md
 +++ b/SOLUTION.md
-@@ -24,8 +24,16 @@
+@@ -1,6 +1,6 @@
+ # Ball possession from automatic tracking, learned on other games
+
+-Technical document for More than a Hack 2027, Phase 1.
++Technical document for More than a Hack 2027, Phase 1. Team: **encara_messi**.
+
+ ## Summary
+
+@@ -12,6 +12,10 @@
+ penalties are chosen by leave-matches-out spellF1 on the Bundesliga data.
+
+ No label of any kind from BAR-ATH is used for training, tuning or model selection.
++
++The table below preserves the original team-reported development results. The
++independent reconstruction described immediately afterward verifies the final
++configuration separately; it does not reproduce every historical ablation.
+
+ | | spellF1 | macroF1 |
+ |---|---|---|
+@@ -24,8 +28,16 @@
  | submitted ensemble, BAR-ATH public 5 minutes (sanity check only) | 0.715 | 0.908 |
  | official baseline `smooth50`, BAR-ATH public 5 minutes | 0.326 | 0.621 |
- 
+
 -The BAR-ATH public window has 17 possessions and is reported only to show the pipeline is
 -aligned. It was never used to choose between versions (see "How versions were chosen").
 +The BAR-ATH public window has 17 possessions and is reported only as a pipeline check.
@@ -16,35 +35,36 @@
 +noise. These are reconstructed validation results, separate from the original runs in
 +the table; the original baseline benchmark driver was not included in the repository.
 +The frozen submission CSV itself was regenerated twice on Linux with an exact hash match.
- 
+
  ## Why this approach
- 
-@@ -37,8 +45,8 @@
- 
+
+@@ -37,8 +49,8 @@
+
  That is a learning problem, and learning it needs labels. Hand labels on BAR-ATH are forbidden, but
  the challenge ground truth is defined as the dead-ball flag and owning team of corrected tracking,
 -which is exactly what DFL position data provides per frame for other games. So we learn on those
 -games and transfer.
 +which are also available as broad state variables in DFL position data for other games.
 +Their possession semantics and granularity can differ. We learn on those games and transfer.
- 
+
  The ranking metric scores whole possessions by temporal IoU, so per-frame accuracy is not enough. A
  classifier that is 90% right per frame still flickers and splits possessions, which is why decoding
-@@ -61,8 +69,9 @@
+@@ -61,8 +73,10 @@
  - Homography, both videos and the broadcast ATD. Not needed for a tracking-only model, and the
    broadcast feed is not synchronised.
- 
+
 -**External training data.** IDSSE, "An integrated dataset of synchronized spatiotemporal and event
 -data in elite soccer" (Bassek, Weber, Rein and Memmert, Scientific Data 2025, CC-BY 4.0). It has 7
 +**External training data.** IDSSE, "An integrated dataset of spatiotemporal and event
 +data in elite soccer" (Bassek, Rein, Weber and Memmert, Scientific Data 2025,
-+DOI: 10.1038/s41597-025-04505-y; CC-BY 4.0). It has 7
++[DOI: 10.1038/s41597-025-04505-y](https://doi.org/10.1038/s41597-025-04505-y);
++[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)). It has 7
  full matches from the 2022/23 Bundesliga and 2. Bundesliga, about 1.0 M frames at 25 fps. We use
  only the position data, with its per-frame `BallStatus` (alive or dead) and `BallPossession`
  (team). These fields ship with the DFL data. We did not produce or alter them, and the collection
-@@ -76,7 +85,8 @@
+@@ -76,7 +90,8 @@
  `possession/model.py:add_noise`
- 
+
  - **Ball dropouts.** BAR-ATH's graded ball-missing mask is laid over each training match at a
 -  random offset, which reproduces gap lengths and their drift through a half exactly.
 +  random offset. This reuses the observed long-gap pattern, but rotation, truncation and
@@ -52,8 +72,8 @@
  - **Player dropouts.** Each player drops out as a two-state Markov chain, about 7% missing with a
    mean outage of 2 s. This gives 20.5 tracked players per frame, as in BAR-ATH.
  - **Dead balls.** DFL freezes the ball position while play is dead. That is a shortcut the ATD
-@@ -116,7 +126,9 @@
- 
+@@ -116,7 +131,9 @@
+
  `possession/tcn.py`. The LightGBM context stops at 15 s, while ball gaps run 10 to 40 s. A
  non-causal dilated 1-D CNN over the same 111 features (10 residual blocks, dilations 1 to 512,
 -width 96, receptive field about 80 s) sees a whole gap and both of its edges at once. It is trained
@@ -63,25 +83,78 @@
  with cross-entropy on 4096-frame chunks of 4 noise realisations per match, both team orientations,
  for 30 epochs on one GPU, and symmetrised like LightGBM. Six such networks are averaged: the base
  one, two more seeds, one with 8 noise realisations, one with 60 epochs and one of width 128. Seed
-@@ -180,6 +192,10 @@
+@@ -138,22 +155,29 @@
+
+ ## Possession rules as implemented
+
+-The rules are learned from DFL's definitions and not hand-written. In practice:
+-
+-- **Loose balls and challenges.** Possession stays with the last team until the evidence for the
+-  other team is strong enough, for long enough, to pay the switch penalty. Brief touches and
+-  deflections are therefore absorbed into the surrounding possession.
++The classifier learns DFL state labels, while the decoder applies explicit transition
++penalties. There are no frame-specific corrections or manually marked restarts.
++The resulting behavior is:
++
++- **Loose balls and challenges.** The decoder penalizes a change between teams. It uses the
++  full half, including future evidence, rather than an online last-touch rule. Short
++  reversals can be absorbed when their evidence does not outweigh the transition costs;
++  the method does not guarantee that every deflection is treated correctly.
+ - **Restarts.** A dead stretch ends at the frame where the decoded state returns to alive, and the
+   restarting team is whatever the classifier sees taking the ball. Dead-ball ownership is not
+   modelled, as the challenge asks.
+-- **Ball out of play.** This comes from the ball crossing a line and from the collective slowdown
+-  of the players. The latter is the only evidence when the ball is not tracked.
++- **Ball out of play.** The classifier can use ball position relative to pitch boundaries and
++  player movement. During ball gaps it also uses interpolated ball features, gap timing,
++  and team shape. These are learned cues, not a geometric out-of-play rule.
+
+ ## How versions were chosen
+
+-Every decision used the IDSSE held-out spellF1 or a label-free check on BAR-ATH (the predicted
+-dead-ball share against the 40 to 45% normal in football). The public window was looked at after
+-each version only to confirm the pipeline still aligned.
++The original development record below reports decisions based on IDSSE held-out
++spellF1 and label-free checks of the predicted BAR-ATH dead-ball share. The public
++window was used only to check pipeline alignment, not to rank or choose versions.
++The numerical version history is retained from the team draft and was not independently
++reconstructed. Inspecting label-free target statistics is still adaptation to this
++match; it does not establish performance on other games.
+
+ | version | change | IDSSE held-out spellF1 | BAR-ATH predicted D share |
+ |---|---|---|---|
+@@ -180,6 +204,13 @@
    without it (0.90 and 0.77 for LightGBM alone). Most of the remaining error is here.
  - **One noise model.** The ball mask comes from BAR-ATH, but its correlation with game state, such
    as crowded boxes and aerial balls, is not reproduced. Gaps are placed at random relative to play.
 +- **Whole-sequence normalization.** GroupNorm makes predictions depend on global sequence
 +  statistics as well as local convolutional context. BAR-ATH includes ungraded intervals
 +  in the CNN input, whereas the converted IDSSE records contain compact halves. This
-+  transfer difference has not been independently validated.
++  transfer difference can change predictions. A separate controlled diagnostic on the
++  seven external matches confirmed sensitivity to added ungraded feature context.
++  It provides no BAR-ATH accuracy estimate, and no research alternative replaces
++  the frozen submitted model.
  - **Smart Tagging is unused.**
- 
+
  With more time we would try the following.
-@@ -202,7 +218,9 @@
+@@ -202,10 +233,16 @@
  bash run.sh          # downloads IDSSE, converts, trains, predicts, validates
  ```
- 
+
 -`run.sh` writes `submission/submission.csv`. LightGBM training is deterministic (fixed seeds,
+-`deterministic=True` with 8 threads) and the CNN is loaded from the committed weights, so repeated
+-runs give a byte-identical file, also from a fresh clone, environment and download. The optional steps in `run.sh` re-derive the committed
+-`possession/tcn.pt` (on a GPU, which may differ in the last bits) and `possession/decoder.json`.
 +`run.sh` writes `submission/submission.csv`. The frozen six-network source is commit
 +`602b6139b8fe82d0256515102444534bf94b32d7`. The submitted CSV SHA-256 is
 +`557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c`. LightGBM training is deterministic (fixed seeds,
- `deterministic=True` with 8 threads) and the CNN is loaded from the committed weights, so repeated
- runs give a byte-identical file, also from a fresh clone, environment and download. The optional steps in `run.sh` re-derive the committed
- `possession/tcn.pt` (on a GPU, which may differ in the last bits) and `possession/decoder.json`.
++`deterministic=True` with 8 threads) and the CNN is loaded from the committed weights, and repeated
++Linux checks reproduced the same file, including a fresh-clone check. Exact reproduction
++was verified in the recorded environment; changes to numerical libraries or hardware
++should be checked against the CSV hash. The commented optional steps in `run.sh` are research
++commands, not required submission steps. Retraining a CNN can change its weights, and
++the optional ensemble command defaults to a single CNN and can overwrite
++`possession/decoder.json`. Leave those commands commented when reproducing this submission.
+
+ | file | role |
+ |---|---|

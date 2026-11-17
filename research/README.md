@@ -86,11 +86,10 @@ separately named half-isolated research candidate is retained in that directory;
 it is not the official submission and has not been evaluated against BAR-ATH
 labels. Its generating scripts are research code on this local branch.
 
-The registered team name supplied by the user is `encara_messi`. Exact frozen
-submission copies are staged privately in
-`artifacts/submission-packages/encara_messi/`, alongside a proposed document for
-team review. `package_submission.py --team-name encara_messi` validates and
-stages them without overwriting edits. The submission deadline is November 17,
+The registered team name supplied by the user is `encara_messi`. The exact frozen CSV and a revised technical-document draft are staged privately in
+`artifacts/submission-packages/encara_messi/`, for team review, with the original draft preserved separately. To rebuild the
+review bundle, use `package_submission.py --team-name encara_messi --document research/artifacts/submission-packages/encara_messi/encara_messi.md --bundle`.
+The helper preserves differing existing files instead of overwriting them. The submission deadline is November 17,
 2026, 23:59 CET / 17:59 America/New_York. One designated team member still needs
 to complete the Google Form after reviewing the document. Nothing has been
 pushed or submitted.

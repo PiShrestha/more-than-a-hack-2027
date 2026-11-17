@@ -489,3 +489,33 @@ are privately backed up. Detailed machine-readable records are
 resource-accounting.json, storage-accounting.json, followup-results.json and
 backup-inventory.json. The remaining submission steps are team document review
 and one designated form response; no push or form submission has occurred.
+
+### Submission-document review and transfer bundle
+
+Reviewed the staged technical document against the frozen classifier, CNN,
+decoder, run.sh and submission rules. The revised draft explicitly labels
+unretained historical scores as team-reported, preserves independently
+reconstructed scores separately, explains offline Viterbi behavior and the
+limits of inferred possession rules, and warns that the commented optional
+ensemble command can overwrite the frozen decoder. The IDSSE paper title,
+author order and CC-BY attribution were checked against the publisher record
+and PubMed (https://pubmed.ncbi.nlm.nih.gov/39893199/).
+
+The named private encara_messi.md now contains this edited draft, pending
+team wording review. ORIGINAL_FROZEN_SOLUTION.md preserves the previous copy.
+No repository SOLUTION.md or inference file was changed. The complete review
+is retained as research/solution-review.patch; it applies cleanly to frozen
+SOLUTION.md but has not been applied there.
+
+package_submission.py now accepts an explicit Markdown source and optionally
+builds a deterministic ZIP containing only the named CSV and Markdown. Existing
+different documents are preserved with an error. Revised bundles receive a
+content-hash filename so the prior bundle is preserved. Two consecutive
+packaging runs produced identical bundles. ZIP entry names, hashes, CRCs and
+the exact CSV validator passed. The ZIP is a convenience transfer artifact;
+the Google Form takes the individual CSV and Markdown. No licensed tracking
+assets, research probabilities, or research candidate are included.
+
+This continuation consumed no additional cluster compute. Remaining external
+actions: team document review and one designated form submission. No response
+has been sent, and no branch has been pushed.
