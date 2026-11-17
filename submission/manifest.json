@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "team": "encara_messi",
+  "match": "BAR-ATH",
+  "rows": 199319,
+  "fps": 25,
+  "frozen_model_commit": "602b6139b8fe82d0256515102444534bf94b32d7",
+  "repository": "https://github.com/PiShrestha/more-than-a-hack-2027",
+  "note": "Exact prepared submission files. Form receipt and private score are not recorded here.",
+  "artifacts": {
+    "csv": {
+      "path": "submission/submission.csv",
+      "upload_filename": "encara_messi.csv",
+      "sha256": "557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c"
+    },
+    "document": {
+      "path": "submission/encara_messi.md",
+      "upload_filename": "encara_messi.md",
+      "sha256": "4139e1dc85a0bc5cc249b27702da4c9aa3db57dde4e650d3f845760de8fb3550"
+    }
+  },
+  "pipeline_files": {
+    "evaluation/gt/BAR-ATH_possession_gt_public_meta.json": "cd8784f7c33127d9a87808a8baab16c5fa64c7eeeb4824c4036726ce73258c5a",
+    "evaluation/possession_metrics.py": "341bad48904b489d6e875397b27687f5d6a4d22a397f3dc8af3a00d48f16874d",
+    "evaluation/run_evaluation.py": "1c61564fe52499ba4af3006fb5eb4147b825e92bf516651add80de49d267b19f",
+    "evaluation/validate_submission.py": "07ac29499acbd337e1dc1de1832d63f6e1fa1d981e22f6ad08212529e2bbee14",
+    "games.py": "3b2122794e9e0476e2b3a871d14880e5fa47c4feaeacf99caef054c2309076ce",
+    "possession/data.py": "a1178c1dc80347afe4f1183ce3371095dc6f7ce05ec08f451674891e38f46494",
+    "possession/decoder.json": "1ec13b7de29b6888f53787a0c3856c0cb0962b40b21b2a8748014543c1545291",
+    "possession/features.py": "bed304fb3b8f1519709d0ab706b869fa4d8f9feec26e6f566377d915b040cd84",
+    "possession/fetch_idsse.sh": "19e4f44a1c34480a3d57b70aceba116e658607bd1d959175a5c0ed9330aee86a",
+    "possession/idsse.py": "0c5666a0273e5fa39d5408d7433e5a7caad0ad3932f713c8acb24ff6155be1cc",
+    "possession/model.py": "dae4a1082f8aea58944aafb35428052c14afc6e7e39183943c07639addba0ab8",
+    "possession/tcn.pt": "0ce0dc5cb1dedde2af0b9e95885d0bf3b106931149703ced32dd73d0bd8d6f97",
+    "possession/tcn.py": "00df2fd192ab6206725f2cddb1223575b0454bb1895fa37c6350d0d75b6fbc5a",
+    "possession/tcn_e60.pt": "378879a7e4c73cb557655cee35f573b31d71f51cbb894911aa1c7026f0c45e7f",
+    "possession/tcn_r8.pt": "24a0ea5fe5cde48bdf2141c173e3d8c260820707a07bba13b71c9b4588998467",
+    "possession/tcn_s1.pt": "8961519c77b9c7c11ba78205fd5c2bcc1028ba5ea4ef5e050247a2b9b325139a",
+    "possession/tcn_s2.pt": "6d42efb6c495345cf5a7731597bd03af931f899bd7932cc2baa59148b60b68db",
+    "possession/tcn_w128.pt": "575a3c813d699b8d389c1d6a311f1a8b98394ff6a90964d946f477cb74896b5e",
+    "requirements-solution.txt": "04c182078d33b30e9a19e2cef183b8195f916b27ba0e53e24c5b6e69b88d313f",
+    "requirements.txt": "49496514559f4a7f8c68de8f16f9fe20b2b4463965210a90904ed8c17c2df9e2",
+    "run.sh": "4b831716f29a8339264097f878fe3de2d862bc1f6a6295a4c540cb2b13fa90f3",
+    "starter/baseline.py": "84d8a414fb1bdf8c7e1fbe4a8789fe6f9cc0c2cccec4685201285b75dbc0cfe6",
+    "starter/load_atd.py": "6c63ee807ae5c1456d0f4dec933f61ad05227c1c663e7e80c96ead1255eeed30",
+    "starter/load_homography.py": "3bc547b8034766023520b0bc2ffd5a4650ce60c9e20c09796cb4a0d805327bd8",
+    "starter/load_smart_tagging.py": "cacfe90acf1deb37b3aa3e4666d6a9d5595c1766d59fe24c9150e1a1d51d0c64",
+    "starter/make_dummy_submission.py": "d743a8be38f54b43980d8400b1e33027d564077065b999a559deb90f940e5cea",
+    "starter/utils.py": "1a1d74ca9ba8b8507bda69707a487c6bbf26cc3a254e6894747397eca3f414d5"
+  }
+}

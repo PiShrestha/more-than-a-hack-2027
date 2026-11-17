@@ -1,194 +1,80 @@
-# More than a Hack 2027 — Phase 1: Ball Possession
+# encara_messi: football possession from automatic tracking
 
-**Organised by [Metrica Sports](https://metrica-sports.com), [FC Barcelona](https://www.fcbarcelona.com)
-and the [Mobile World Capital Barcelona](https://www.mwcbarcelona.com)**, at the Talent Arena in Barcelona.
+Our Phase 1 entry for More than a Hack 2027 labels all 199,319 frames of the
+Barcelona vs Athletic Club tactical video as home possession, away possession,
+dead ball, or outside the published halves.
 
-A football data challenge on real professional match data, open to analysts, data scientists and
-engineers. You are given one complete LaLiga match — two camera feeds, automatic tracking of every
-player and the ball, automatic tactical tagging, and the camera-to-pitch geometry — and one
-question to answer with it.
+We train LightGBM and six temporal CNNs on seven external Bundesliga matches,
+with tracking degraded to match BAR-ATH's missing observations. A Viterbi
+decoder joins frame predictions into possessions. No BAR-ATH labels are used
+for training, tuning, or model selection.
 
----
+## The submission
 
-## The task
+- [Final technical document](submission/encara_messi.md), uploaded as `encara_messi.md`.
+- [Fixed prediction CSV](submission/submission.csv), uploaded as `encara_messi.csv`.
+- [File hashes and model record](submission/manifest.json).
+- [Reproduction instructions](REPRODUCING.md).
 
-**For every frame of the match, say who has the ball.**
+These are the exact files prepared in Downloads. A form receipt and private
+full-match score have not been recorded in this repository.
 
-```
-frame,label
-11185,A        away in possession, ball alive
-11186,A
-...
-18240,D        dead ball
-...
-18684,H        home in possession, ball alive
-```
+The model is frozen at commit `602b6139b8fe82d0256515102444534bf94b32d7` on
+[`possession-model`](https://github.com/PiShrestha/more-than-a-hack-2027/tree/possession-model).
+This branch adds the final document, release tools, and checks. It does not
+change the classifier, weights, features, decoder, or predictions.
 
-That is the whole task. One CSV, one row per video frame, 199,319 rows. It is scored automatically
-against a private frame-by-frame ground truth, so there is a number at the end and no argument
-about it — no jury, and no presentation to argue from.
+## Verify or prepare upload files
 
-The tracking is automatic and uncorrected: it has gaps and identity
-switches, and the ball itself is invisible on 41% of the frames you are scored on.
-
----
-
-## The challenge in one screen
-
-| |                                                                                                                           |
-|---|---------------------------------------------------------------------------------------------------------------------------|
-| **Input** | one full match: tactical video, broadcast video, automatic tracking **with the ball** for both, Smart Tagging, homography |
-| **Output** | `frame,label` CSV, 199,319 rows, labels `H` / `A` / `D` / `X`                                                             |
-| **Ranked on** | `spellF1` — how many of the match's real possessions you recovered as whole possessions                                   |
-| **Also reported** | `macroF1` — the per-frame view, and the first tie-break                                                                   |
-| **Baseline to beat** | `spellF1` **0.2433**, in this repository                                                                                  |
-| **Ground truth you get** | the first **5 minutes** of play — to check your pipeline, not to train on                                              |
-| **Ground truth you are scored on** | the full match, **private**                                                                                               |
-
-It is deliberately **not** a tracking challenge. The tracking, tagging and homography are given to
-you so that nobody has to rebuild detection, re-identification and camera calibration before
-getting to the actual question. See [CHALLENGE.md](CHALLENGE.md).
-
----
-
-## Try it right now
-
-The scorer, a 5-minute ground truth and four working baselines are in this repository. No
-enrolment, no download, no data:
+These commands use Python's standard library and need no match data or ML packages:
 
 ```bash
-pip install -r requirements.txt
-python evaluation/run_evaluation.py
+python3 tools/submission.py verify
+python3 tools/submission.py package --output-dir dist/encara_messi
 ```
 
-Scored on the public 5 minutes, not on the full match -- which is why the order below is not the
-order of the floor quoted above:
+The second command creates `encara_messi.csv` and `encara_messi.md`. The CSV
+SHA-256 is:
 
-```
-scoreboard  gt/BAR-ATH_possession_gt_public.csv  199319 frames  7500 graded  21 gt segments
-ground truth has 17 possessions of mean 14.2 s  <- compare the poss and dur columns
-
-rank  submission                macroF1  spellF1   poss     dur  
-----  ------------------------  -------  -------  -----  ------  
-   1  baseline_smooth125         0.5812   0.4242     16    18.5  
-   2  baseline_smooth50          0.6207   0.3256     26    10.8  
-   3  baseline_smooth25          0.6200   0.2868     36     7.6  
-   4  baseline_raw               0.5972   0.0378    131     2.0  
+```text
+557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c
 ```
 
-Those four are **the same algorithm four times** — nearest tracked player to the ball, then a
-majority vote over a window. Only the window changes. `macroF1` barely moves; `spellF1` moves by a
-factor of eleven. That disagreement is the whole point of the metric, and
-[EVALUATION.md](EVALUATION.md) explains it.
+## Evidence and limits
 
-Once you have the data, regenerate them yourself and go further:
+Independent reconstruction gave mean external-match spellF1 **0.6383**, versus
+**0.1925** for the shipped smooth50 baseline under the same noise. The seven
+matches were also used for model selection. This is validation, not an untouched
+test. The small public BAR-ATH window is a pipeline check, not a tuning set or an
+estimate of the private score.
 
-```bash
-python starter/baseline.py                              # rebuild the four baselines
-python evaluation/validate_submission.py <your>.csv     # before every submission
-```
+Repeated Linux runs reproduced the CSV exactly, including a fresh-clone check.
+CI checks artifact integrity and packaging on each release-branch change. It
+neither trains models nor evaluates private match labels.
 
-**Validate every file before you submit it.** `validate_submission.py` runs exactly the checks the
-official scorer runs, and a file that fails them is dropped from the board with a one-line reason.
-It takes two seconds and it is the single most common way a good entry scores nothing.
+## Project layout
 
----
+`possession/` contains the frozen model and six saved CNNs. `evaluation/` contains
+the official validator and scorer. `submission/` contains the exact release
+record and final document. `tools/submission.py` verifies, packages, and safely
+runs the original reproduction pipeline.
 
-## Getting the data
+The completed experiments and audits remain on the separate
+[`cluster-verification-20261116`](https://github.com/PiShrestha/more-than-a-hack-2027/tree/cluster-verification-20261116)
+branch. The earlier heuristic model remains on
+[`possession-pipeline`](https://github.com/PiShrestha/more-than-a-hack-2027/tree/possession-pipeline).
+Neither is a replacement submission.
 
-The match assets are released to enrolled participants who have accepted the terms of use.
+The [organizer README](CHALLENGE_README.md), [challenge](CHALLENGE.md),
+[rules](RULES.md), [data guide](DATA.md), [evaluation guide](EVALUATION.md), and
+[submission instructions](SUBMISSION.md) are retained. The original
+[SOLUTION.md](SOLUTION.md) is preserved as a historical draft; use the final
+technical document linked above.
 
-1. Enrol: **[More than A Hack 2027](https://landing.mobileworldcapital.com/more-than-a-hack-2027)**
-2. Read and sign the terms and conditions in the registration form
-3. You receive a download link.
-4. Unpack it into `./data`, or point `MTAH_DATA_DIR` at wherever you put it.
+## Data and license
 
-Full description of every asset and how the frames line up: **[DATA.md](DATA.md)**.
-
----
-
-## Read these, in this order
-
-| | |
-|---|---|
-| **[CHALLENGE.md](CHALLENGE.md)** | the problem, the four labels, what counts as possession |
-| **[DATA.md](DATA.md)** | every provided asset, its format, and the frame alignment |
-| **[EVALUATION.md](EVALUATION.md)** | how you are scored, and why — read before optimising anything |
-| **[SUBMISSION.md](SUBMISSION.md)** | the file contract, the three deliverables, how to submit |
-| **[RULES.md](RULES.md)** | what you may and may not do |
-| **[FAQ.md](FAQ.md)** | |
-| **[OVERVIEW.md](OVERVIEW.md)** | the competition as a whole — context, why the 2027 format changed, the calendar |
-
-
----
-
-## What is in this repository
-
-```
-games.py                    per-match constants, asset paths and the frame alignment
-evaluation/
-  possession_metrics.py     the metric library — every number on the board is defined here
-  run_evaluation.py         the scorer. This exact file produces the official result
-  validate_submission.py    check a file before you send it
-  gt/                       the public 5-minute ground truth
-  results/                  the four baselines; put your submissions here
-starter/
-  baseline.py               the reference baseline, numpy only
-  load_atd.py               read the tracking and line it up with video frames
-  load_smart_tagging.py     read the tactical tagging as video-frame intervals
-  load_homography.py        read the homography; project pitch <-> pixels
-  utils.py                  pitch plotting for the notebooks
-  01_smart_tagging.ipynb    guided tour of the tactical tagging
-  02_tracking_atd.ipynb     guided tour of the tracking data, with plots
-  03_first_submission.ipynb data in, scored submission out — start here
-data/                       unpack the downloaded match assets here. Empty in a fresh clone
-```
-
-The scorer you run locally is the scorer that decides the competition. If it scores on your
-machine, it scores the same way on ours.
-
----
-
-## Requirements
-
-**Python 3.8 or newer.** The evaluation needs `numpy` and `pandas` and nothing else; it is tested
-under 3.8 and 3.11 and produces identical output under both. `starter/baseline.py` needs nothing
-more either — you can reach a scored submission without installing anything else.
-
-The notebooks additionally want `kloppy` and `matplotlib` (`requirements-starter.txt`), and
-**Python 3.9+ is recommended for those**: on Windows, installing Jupyter under 3.8 hits a
-`pywinpty` build failure that has nothing to do with this repository.
-
----
-
-## Timeline
-
-| |                |
-|---|----------------|
-| registration opens | **October 1, 2026** |
-| data released | **October 20, 2026** |
-| submission deadline | **November 17, 2026** |
-| results announced | **Before November 26, 2026**      |
-
----
-
-## Questions
-
-Open an issue for anything about the data, the metrics or the documentation — corrections are
-genuinely useful, and a fix that helps you helps everyone equally. For enrolment and the terms of
-use: **hackathon.talentarena@mobileworldcapital.com**.
-
-## Licence and citation
-
-The code and documentation in this repository are released under the MIT Licence — see
-[LICENSE](LICENSE). **The match data is not covered by it**: it is separately licensed for this
-competition only, under the terms you accept at enrolment.
-
-```bibtex
-@misc{mtah2027,
-  title  = {More than a Hack 2027: Phase 1 - Ball Possession},
-  author = {Metrica Sports and FC Barcelona Innovation Hub},
-  year   = {2027},
-  url    = {https://github.com/metrica-sports/more-than-a-hack-2027}
-}
-```
+Licensed BAR-ATH tracking and video are not distributed here. Supply the
+permitted tactical tracking and metadata locally. The open external data comes
+from [IDSSE](https://doi.org/10.1038/s41597-025-04505-y), by Bassek, Rein, Weber,
+and Memmert, under CC BY 4.0. See [LICENSE](LICENSE) for the repository license
+and its separate treatment of competition assets.

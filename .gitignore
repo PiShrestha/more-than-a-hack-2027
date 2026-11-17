@@ -66,3 +66,6 @@ slurm_scripts/
 logs/
 submission/proba.npy
 possession/decoder_*.json
+
+# Local upload packages and generated release output.
+dist/
