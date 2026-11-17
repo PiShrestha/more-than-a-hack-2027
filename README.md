@@ -51,6 +51,8 @@ test. The small public BAR-ATH window is a pipeline check, not a tuning set or a
 estimate of the private score.
 
 Repeated Linux runs reproduced the CSV exactly, including a fresh-clone check.
+The guarded fresh-cache release run also passed in 7 minutes 46 seconds; see
+the [verification record](submission/verification.json).
 CI checks artifact integrity and packaging on each release-branch change. It
 neither trains models nor evaluates private match labels.
 

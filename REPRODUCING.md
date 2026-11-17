@@ -22,9 +22,9 @@ installation command. The complete reconstruction was checked on Linux
 with eight CPU cores and a 32 GiB memory allocation. No GPU is needed for
 submission inference. Allow several GiB of working space for converted data
 and fresh caches. Runtime depends on hardware and download speed. Reserve at least 30 minutes for
-a fresh-cache run on a shared cluster. A 15-minute release check timed out after
-converting the external data; the previously completed exact reproduction checks
-remain recorded on the research branch.
+a fresh-cache run on a shared cluster. One 15-minute release check timed out;
+the retry passed in 7 minutes 46 seconds on another node. The
+[verification record](submission/verification.json) includes both attempts.
 
 ## Verify the committed files
 
@@ -98,7 +98,8 @@ loaded for CPU inference.
 
 The original official validator runs inside that pipeline. Packaging succeeds
 only if the regenerated CSV also matches the expected SHA-256 exactly. A
-failure returns a nonzero exit code. Temporary files are removed afterward.
+failure returns a nonzero exit code. Temporary files are removed on normal completion or a handled error. A hard
+scheduler kill can leave private temporary caches under the temporary directory.
 
 Do not enable the optional research commands in `run.sh`. They can replace
 model weights or decoder settings. Leave them on a research branch and give
