@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
-from tools.submission import inside, package, sha256, validate_csv, verify_release
+from tools.submission import check_environment, inside, package, reproduce, sha256, validate_csv, verify_release
 
 
 class ReleaseTests(unittest.TestCase):
@@ -70,6 +71,40 @@ class ReleaseTests(unittest.TestCase):
         package(self.root, out)
         self.assertEqual(first, {p.name: p.read_bytes() for p in out.iterdir()})
         self.assertEqual(first['encara_messi.csv'], self.csv.read_bytes())
+
+    def test_model_environment_overrides_are_rejected_before_training(self):
+        with mock.patch.dict('os.environ', {'POSS_ROUNDS': '1'}):
+            with self.assertRaisesRegex(ValueError, 'Unset model overrides'):
+                check_environment()
+
+    def test_reproduction_uses_temporary_sources_and_fresh_caches(self):
+        data = self.root / 'private-data'
+        data.mkdir()
+        raw = data / 'tracking.xml'
+        raw.write_text('raw input')
+        entry = dict(path='tracking.xml', size=raw.stat().st_size, sha256=sha256(raw))
+        (self.root / 'submission/input-manifest.json').write_text(json.dumps([entry]))
+        (data / 'cache').mkdir()
+        (data / 'cache/stale.npz').write_bytes(b'stale')
+        seen = []
+
+        def pipeline(command, cwd, env, check):
+            stage = Path(cwd)
+            seen.append(stage)
+            self.assertNotEqual(stage, self.root)
+            self.assertTrue((stage / 'data/tracking.xml').is_symlink())
+            self.assertFalse((stage / 'data/cache').exists())
+            self.assertEqual(env['MTAH_DATA_DIR'], str(stage / 'data'))
+            self.assertEqual((stage / 'weights.pt').read_bytes(), b'fixed checkpoint')
+            self.assertEqual(command, ['bash', 'run.sh'])
+            (stage / 'submission').mkdir()
+            (stage / 'submission/submission.csv').write_bytes(self.csv.read_bytes())
+
+        with mock.patch('tools.submission.check_environment'), mock.patch('tools.submission.subprocess.run', side_effect=pipeline):
+            reproduce(self.root, data, self.root / 'out')
+        self.assertFalse(seen[0].exists())
+        self.assertEqual(raw.read_text(), 'raw input')
+        self.assertEqual((data / 'cache/stale.npz').read_bytes(), b'stale')
 
 
 if __name__ == '__main__':
