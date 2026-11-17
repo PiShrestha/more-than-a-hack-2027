@@ -17,8 +17,9 @@
   "frame_norm_fold_checkpoints": 3,
   "retained_final_tree": true,
   "research_candidate_reproduced": true,
-  "research_commit": "14b79875a1bccd4b8bf1e1334eae4f41ea9fffd2",
-  "verifier_sha256": "13ce47340af26637ed8a29379de1a7848a0a482e9db85edc81d564c64480e7f9",
+  "named_submission_package_verified": true,
+  "research_commit": "68e0045c6f1012e45742cac81d267a3609631ede",
+  "verifier_sha256": "6e7380769885b7750897c3a4a6728a566c4081217ed078831b12170b2ab11113",
   "files": [
     {
       "path": "cluster-status.txt",
@@ -3211,14 +3212,19 @@
       "sha256": "021db888f39be7a15cadaf764071bf6179eab50fbf06c4990817f8656e81c1e1"
     },
     {
+      "path": "submission-packages/encara_messi/ORIGINAL_FROZEN_SOLUTION.md",
+      "bytes": 12742,
+      "sha256": "4821aa941789adfd54c5c68e814b51ee47ec5c31bf16622acd7bcf8b55488a0c"
+    },
+    {
       "path": "submission-packages/encara_messi/PROPOSED_encara_messi_FOR_TEAM_REVIEW.md",
-      "bytes": 14185,
-      "sha256": "86d8c2fac3ff6115ff0b75dc652cc372fc14ebb96a48538004bbd5903f84ccac"
+      "bytes": 15537,
+      "sha256": "aa5ceb27dc4eea834a8b3a57f4b815e64123e7204f4edebce971aa63c9f353a7"
     },
     {
       "path": "submission-packages/encara_messi/README.md",
-      "bytes": 790,
-      "sha256": "af5ede7f4a401bed9906d260fb65eb72f8f2e089b0e8550388f7b0e06ddb8633"
+      "bytes": 1035,
+      "sha256": "7ac823f689c13f968ca76da15e6afed4c04b102e354492ac4dac4ad8314fd858"
     },
     {
       "path": "submission-packages/encara_messi/encara_messi.csv",
@@ -3227,13 +3233,18 @@
     },
     {
       "path": "submission-packages/encara_messi/encara_messi.md",
-      "bytes": 12742,
-      "sha256": "4821aa941789adfd54c5c68e814b51ee47ec5c31bf16622acd7bcf8b55488a0c"
+      "bytes": 15537,
+      "sha256": "aa5ceb27dc4eea834a8b3a57f4b815e64123e7204f4edebce971aa63c9f353a7"
+    },
+    {
+      "path": "submission-packages/encara_messi/encara_messi_submission.zip",
+      "bytes": 453716,
+      "sha256": "5a5135cd7fa150595e1956b677f61bb460ec49a96923217cf1a1f5fec1b50af3"
     },
     {
       "path": "submission-packages/encara_messi/package-manifest.json",
-      "bytes": 1308,
-      "sha256": "ecb01b37d6cd23fb92d1491d1e4279b687c5df27485a9e66d9c82580106f9a5e"
+      "bytes": 1562,
+      "sha256": "0bd354491c85b52d172689bffb08d48aced4e599b968cd8690c14bb7a976c884"
     },
     {
       "path": "submission-packages/encara_messi/validation.txt",
