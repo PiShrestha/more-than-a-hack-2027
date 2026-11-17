@@ -18,13 +18,13 @@
   "retained_final_tree": true,
   "research_candidate_reproduced": true,
   "named_submission_package_verified": true,
-  "research_commit": "68e0045c6f1012e45742cac81d267a3609631ede",
+  "research_commit": "bf71f9985b5837411805dd9e71ec4b60cb27d836",
   "verifier_sha256": "6e7380769885b7750897c3a4a6728a566c4081217ed078831b12170b2ab11113",
   "files": [
     {
       "path": "cluster-status.txt",
-      "bytes": 20956,
-      "sha256": "b3f34d1dd2d587f92d79707f91b94fa8eaf678b0d656f9b830e4ceefc1fc0df0"
+      "bytes": 21429,
+      "sha256": "7ef70d2376712d4a2970931fc700d8c999f6f21d30849015004794b3088c9503"
     },
     {
       "path": "data/cache/BAR-ATH_tactical_atd.npz",
@@ -410,6 +410,11 @@
       "path": "data/verified-inputs.json",
       "bytes": 3754,
       "sha256": "ea38791f2e0bbeb59e0194daeeada0ac4a1f40c384a45f4d6f232f32c3f88d65"
+    },
+    {
+      "path": "github-identity-repair.json",
+      "bytes": 1895,
+      "sha256": "d379bd5c6d04fc3812b7bfd29a62e9655670b3f114c1d2fa42ca179e3d440306"
     },
     {
       "path": "logs/poss-aggregate-final-23041458.log",
@@ -805,6 +810,26 @@
       "path": "logs/research-candidate-repeat-23048161.log",
       "bytes": 3111,
       "sha256": "f48e53e50d7c6f487e942a6a53e247b5cbd6007cdaf7eb4120bec82aa3df5585"
+    },
+    {
+      "path": "logs/submission-release-proof-23076854.log",
+      "bytes": 3632,
+      "sha256": "db29d1cdf31faf4c4764f29215bed754a11bde079a35e4cbe3a792b1bb654086"
+    },
+    {
+      "path": "logs/submission-release-proof-retry-23077630.log",
+      "bytes": 4431,
+      "sha256": "d312fe91d229e72170a945e5aedb120b888f00968093dc8748933186c9a50468"
+    },
+    {
+      "path": "release-reproduction-retry.sbatch",
+      "bytes": 714,
+      "sha256": "9ae82200e931af33a2e52dd71dfcac275a92476f1bba4642e98fa38998ede88e"
+    },
+    {
+      "path": "release-reproduction.sbatch",
+      "bytes": 688,
+      "sha256": "cfba385ba2b81238fab2926ba2f85ca36649421df82d681c74bd75f0ac79d824"
     },
     {
       "path": "results/artifact-audit.json",
@@ -1520,6 +1545,16 @@
       "path": "results/period-audit.json",
       "bytes": 23082,
       "sha256": "abf09ec0eae6f332baf573e54b66af07ddcefa8a0f4ff6d15cfab1d62abce0fb"
+    },
+    {
+      "path": "results/release-proof/encara_messi.csv",
+      "bytes": 1682773,
+      "sha256": "557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c"
+    },
+    {
+      "path": "results/release-proof/encara_messi.md",
+      "bytes": 7039,
+      "sha256": "4139e1dc85a0bc5cc249b27702da4c9aa3db57dde4e650d3f845760de8fb3550"
     },
     {
       "path": "results/replay-macos-timing.json",
@@ -3227,14 +3262,19 @@
       "sha256": "7ac823f689c13f968ca76da15e6afed4c04b102e354492ac4dac4ad8314fd858"
     },
     {
+      "path": "submission-packages/encara_messi/document-edit-record.json",
+      "bytes": 448,
+      "sha256": "06b5f92e05c9848e328b8a515359df9f0d0ff9d9443c39ba85b907d1e7d953f0"
+    },
+    {
       "path": "submission-packages/encara_messi/encara_messi.csv",
       "bytes": 1682773,
       "sha256": "557ea3435993e72a83839000e98799be75d268f91a8e1fc0432686ab9a27c19c"
     },
     {
       "path": "submission-packages/encara_messi/encara_messi.md",
-      "bytes": 15537,
-      "sha256": "aa5ceb27dc4eea834a8b3a57f4b815e64123e7204f4edebce971aa63c9f353a7"
+      "bytes": 7039,
+      "sha256": "4139e1dc85a0bc5cc249b27702da4c9aa3db57dde4e650d3f845760de8fb3550"
     },
     {
       "path": "submission-packages/encara_messi/encara_messi_submission.zip",
@@ -3242,9 +3282,19 @@
       "sha256": "5a5135cd7fa150595e1956b677f61bb460ec49a96923217cf1a1f5fec1b50af3"
     },
     {
+      "path": "submission-packages/encara_messi/encara_messi_submission_7c83509804fc.zip",
+      "bytes": 450280,
+      "sha256": "7c83509804fc12a2d8681952dfd8e84870472caf14f7e0bd3e3833a6f243469f"
+    },
+    {
       "path": "submission-packages/encara_messi/package-manifest.json",
-      "bytes": 1562,
-      "sha256": "0bd354491c85b52d172689bffb08d48aced4e599b968cd8690c14bb7a976c884"
+      "bytes": 1575,
+      "sha256": "edb5a299911e6dacad790034230b58d02b31a4a2f8d836f8703e4e7e3edaad59"
+    },
+    {
+      "path": "submission-packages/encara_messi/previous-review-aa5ceb27dc4e.md",
+      "bytes": 15537,
+      "sha256": "aa5ceb27dc4eea834a8b3a57f4b815e64123e7204f4edebce971aa63c9f353a7"
     },
     {
       "path": "submission-packages/encara_messi/validation.txt",
